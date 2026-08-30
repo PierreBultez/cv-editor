@@ -65,7 +65,7 @@ class Cv extends Model
     {
         $plainToken = Str::random(48);
 
-        $cv = new self();
+        $cv = new self;
         $cv->forceFill([
             'template' => 'classic',
             'theme' => CvDefaults::theme(),

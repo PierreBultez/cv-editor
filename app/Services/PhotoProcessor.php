@@ -27,13 +27,14 @@ use Throwable;
 final class PhotoProcessor
 {
     private const SIZE = 512;
+
     private const THUMB_SIZE = 256;
 
     private ImageManager $manager;
 
     public function __construct()
     {
-        $this->manager = new ImageManager(new Driver());
+        $this->manager = new ImageManager(new Driver);
     }
 
     /**

@@ -1,58 +1,137 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# CV Studio
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Générateur de CV en ligne : on remplit ses expériences, ses formations et ses
+compétences, on choisit deux couleurs et deux polices, on ajoute sa photo, et
+l'aperçu au format A4 se met à jour à chaque frappe. Impression navigateur pour
+obtenir le PDF, lien public pour partager.
 
-## About Laravel
+Le projet est né d'un CV personnel statique, conservé dans [`legacy/`](legacy/) :
+sa mise en page est devenue le template « Classique » de l'outil.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Couche | Choix |
+|---|---|
+| Back | Laravel 13, SQLite en dev |
+| Pont | Inertia 3 |
+| Front | Vue 3, Vite 8, TypeScript, Pinia |
+| UI | Nuxt UI 4 en **mode Vue standalone** (pas de Nuxt), Tailwind CSS v4 |
+| Images | Intervention Image 4 (GD) |
+| Tests | Pest 4 |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+> Nuxt n'est pas utilisé : Nuxt et Inertia se disputeraient le routage. Nuxt UI
+> s'installe sans lui via `@nuxt/ui/vite` et `@nuxt/ui/vue-plugin`, configuré
+> avec `router: 'inertia'`.
 
-## Learning Laravel
+## Pas de comptes
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Il n'y a ni inscription, ni connexion, ni table `users`. Un CV est identifié par
+un `public_id` (ULID non devinable) pour la lecture, et protégé en écriture par
+un `edit_token` de 48 caractères, **stocké haché** en base et conservé côté
+visiteur dans le `localStorage`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Conséquence assumée : effacer les données du site, changer de navigateur ou
+naviguer en privé fait perdre l'accès en écriture. Le CV reste consultable par
+son lien public.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Démarrer
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Prérequis : [Laravel Herd](https://herd.laravel.com) (fournit PHP 8.4, Composer,
+nginx) et Node 20+.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+```bash
+npm install
+```
 
-## Contributing
+```bash
+php artisan migrate --seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan storage:link
+```
 
-## Code of Conduct
+Puis, dans deux terminaux :
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+npm run dev
+```
 
-## Security Vulnerabilities
+```bash
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Le CV de démonstration est servi sur `/cv/01K0DEMXCV0000000000000000`.
 
-## License
+## Tests
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan test
+```
+
+## Points d'architecture
+
+**Le thème est du CSS, pas un build.** `resources/js/lib/palette.ts` dérive une
+échelle de sept nuances à partir d'une seule couleur, en OKLCH : la teinte est
+conservée, la luminosité de chaque palier est imposée. Les variables
+`--cv-primary-*` sont posées en style inline sur la racine de l'aperçu, donc
+changer de couleur ne recompile rien.
+
+La luminosité étant imposée, une couleur très claire ressort plus foncée que
+celle choisie — c'est ce qui garantit le contraste des titres sur blanc à
+l'impression. Le sélecteur affiche les nuances obtenues pour éviter la surprise.
+
+**Le contenu est une colonne JSON.** Les sections sont hétérogènes,
+réordonnables et activables ; sept tables normalisées auraient triplé le travail
+sans bénéfice, puisqu'on ne requête jamais entre CV.
+[`UpdateCvRequest`](app/Http/Requests/UpdateCvRequest.php) est donc le seul
+garant de la forme de `content`, et
+[`CvDefaults`](app/Support/CvDefaults.php) la référence unique des valeurs
+autorisées — côté serveur comme côté client.
+
+**Les polices sont auto-hébergées au build**, déclarées dans
+[`vite.config.ts`](vite.config.ts) via les providers `local` (Satoshi) et
+`bunny` de `laravel-vite-plugin`. Chaque famille expose une variable
+`--font-{alias}`. Le navigateur ne télécharge une famille qu'au moment où elle
+est réellement appliquée.
+
+**L'aperçu est la feuille.** La page fait 210 × 297 mm en dimensions réelles ;
+[`A4Frame`](resources/js/components/preview/A4Frame.vue) ne fait que la réduire
+par une transformation CSS, neutralisée à l'impression. Ce qui est à l'écran est
+ce qui sort en PDF.
+
+## Impression
+
+Le bouton « Imprimer / PDF » masque l'interface et ne sort que la feuille. Dans
+la boîte de dialogue du navigateur :
+
+- Destination : **Enregistrer au format PDF**
+- Papier : **A4**, marges **Aucune**, échelle **100 %**
+- Activer **Graphiques d'arrière-plan**
+- Désactiver en-têtes et pieds de page
+
+## Données personnelles
+
+Un service anonyme qui stocke des CV conserve des données personnelles sans que
+personne ne puisse revenir les gérer. Trois garde-fous :
+
+- les pages publiques sont en `noindex` par défaut, l'indexation est un choix
+  explicite dans l'onglet « Réglages » ;
+- un bouton de suppression définitive est disponible dans l'éditeur ;
+- `cv:purge` supprime les CV et leurs photos après 12 mois d'inactivité,
+  planifié chaque lundi à 3 h.
+
+```bash
+php artisan cv:purge --dry-run
+```
+
+## AVIF
+
+Les photos sont réencodées en JPEG (repli garanti), WebP et AVIF. `imageavif()`
+n'existe que si GD a été compilé avec libavif : le pipeline teste la présence de
+l'encodeur et omet simplement la variante sinon, sans jamais faire échouer
+l'upload. Le PHP de Herd la fournit.

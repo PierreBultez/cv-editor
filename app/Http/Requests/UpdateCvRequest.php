@@ -85,18 +85,20 @@ class UpdateCvRequest extends FormRequest
                         continue;
                     }
 
-                    $prefix = "content.sections.{$index}.items";
+                    // Le validateur imbrique est alimente avec une structure
+                    // plate (`items`), car une cle contenant des points serait
+                    // lue comme un chemin et les regles ne trouveraient rien.
                     $scoped = [];
 
-                    foreach ($rules as $field => $rule) {
-                        $scoped[$prefix.$field] = $rule;
+                    foreach ($rules as $suffix => $rule) {
+                        $scoped['items'.$suffix] = $rule;
                     }
 
-                    $nested = validator([$prefix => $section['items'] ?? []], $scoped, [], $this->itemAttributes());
+                    $nested = validator(['items' => $section['items'] ?? []], $scoped, [], $this->itemAttributes());
 
                     foreach ($nested->errors()->messages() as $field => $messages) {
                         foreach ($messages as $message) {
-                            $validator->errors()->add($field, $message);
+                            $validator->errors()->add("content.sections.{$index}.{$field}", $message);
                         }
                     }
                 }

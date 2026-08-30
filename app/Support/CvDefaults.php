@@ -49,8 +49,11 @@ final class CvDefaults
 
     /** Garde-fous de taille, pour eviter le stockage abusif sur un service anonyme. */
     public const MAX_SECTIONS = 12;
+
     public const MAX_ITEMS_PER_SECTION = 40;
+
     public const MAX_BULLETS_PER_ITEM = 10;
+
     public const MAX_CONTACTS = 8;
 
     public static function theme(): array

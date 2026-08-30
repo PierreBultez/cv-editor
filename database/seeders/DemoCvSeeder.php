@@ -33,7 +33,7 @@ class DemoCvSeeder extends Seeder
 
         Cv::where('public_id', self::PUBLIC_ID)->delete();
 
-        $cv = new Cv();
+        $cv = new Cv;
         $cv->forceFill([
             'public_id' => self::PUBLIC_ID,
             'edit_token' => Cv::hashToken('demo-token-non-secret'),
