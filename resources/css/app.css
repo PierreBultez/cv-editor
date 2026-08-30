@@ -221,4 +221,20 @@
         height: auto !important;
         overflow: visible !important;
     }
+
+    /* Imprimer depuis l'editeur ne doit sortir que la feuille : le formulaire
+       porte `no-print`, il reste a neutraliser la grille qui les separe. */
+    .print-canvas {
+        display: block !important;
+        gap: 0 !important;
+        padding: 0 !important;
+    }
+
+    .print-target {
+        position: static !important;
+        width: 210mm !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
 }

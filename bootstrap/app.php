@@ -20,6 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'cv.token' => \App\Http\Middleware\EnsureCvEditToken::class,
         ]);
+
+        // Un CV en cours de redaction contient legitimement des champs vides.
+        // Sans cette exception, ConvertEmptyStringsToNull transforme chaque ""
+        // du JSON en null, que la validation rejette ensuite comme non-string.
+        $middleware->convertEmptyStringsToNull(except: [
+            fn (Request $request) => $request->is('cv/*'),
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

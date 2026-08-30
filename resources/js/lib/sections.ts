@@ -15,6 +15,24 @@ export function sectionIcon(type: SectionType): string {
     return ICONS[type] ?? 'user';
 }
 
+/**
+ * Icones Lucide utilisees par l'interface de l'editeur (Nuxt UI).
+ * Distinctes de `sectionIcon`, qui designe les traces SVG inlines du CV lui-meme.
+ */
+const LUCIDE_ICONS: Record<SectionType, string> = {
+    experiences: 'i-lucide-briefcase',
+    education: 'i-lucide-graduation-cap',
+    certifications: 'i-lucide-award',
+    skills: 'i-lucide-code',
+    languages: 'i-lucide-globe',
+    tools: 'i-lucide-monitor',
+    interests: 'i-lucide-star',
+};
+
+export function sectionLucideIcon(type: SectionType): string {
+    return LUCIDE_ICONS[type] ?? 'i-lucide-layers';
+}
+
 /** Libelles employes dans l'editeur pour proposer l'ajout d'une section. */
 export const SECTION_LABELS: Record<SectionType, string> = {
     experiences: 'Expériences professionnelles',
