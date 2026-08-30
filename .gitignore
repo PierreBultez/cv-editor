@@ -1,26 +1,32 @@
-# Dépendances
-/node_modules
-/vendor
-
-# Environnement
+*.log
+.DS_Store
 .env
 .env.backup
 .env.production
-
-# Build & stockage Laravel
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
 /public/build
+/public/fonts-manifest.dev.json
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
-.phpunit.result.cache
-/.phpunit.cache
-
-# IDE & OS
-/.idea
-/.vscode
-.DS_Store
+/vendor
+_ide_helper.php
+Homestead.json
+Homestead.yaml
 Thumbs.db
 
-# Divers
+# Projet
+/database/*.sqlite
+/database/*.sqlite-journal
 /_prep/tmp

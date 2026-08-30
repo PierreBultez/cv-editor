@@ -1,53 +1,58 @@
-# CV HTML + Tailwind CSS 4
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-Template A4 inspiré du mockup généré dans la conversation.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## Le plus rapide
+## About Laravel
 
-Ouvre directement `index.html` dans Chrome/Edge. Il utilise le Play CDN Tailwind CSS v4.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-Pour exporter :
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-1. Cliquer sur **Imprimer / PDF**.
-2. Destination : **Enregistrer au format PDF**.
-3. Papier : **A4**.
-4. Marges : **Aucune**.
-5. Échelle : **100 %**.
-6. Activer **Graphiques d'arrière-plan**.
-7. Désactiver les en-têtes et pieds de page du navigateur.
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Build Tailwind local
+## Learning Laravel
 
-```bash
-npm install
-npm run dev
-```
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-Puis, dans `index.html` :
+In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-- supprimer le script Play CDN ;
-- déplacer/supprimer le bloc `<style type="text/tailwindcss">...</style>` ;
-- ajouter :
+You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
 
-```html
-<link rel="stylesheet" href="./dist/output.css">
-```
+## Agentic Development
 
-Build minifié :
+Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
 
 ```bash
-npm run build
+composer require laravel/boost --dev
+
+php artisan boost:install
 ```
 
-## Modifier rapidement
+Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
-- Identité : bloc `<header>` dans la colonne principale.
-- Coordonnées : section `Coordonnées` dans `<aside>`.
-- Compétences : modifier les libellés et les largeurs `w-[XX%]`.
-- Expériences : dupliquer un `<article class="experience">...</article>`.
-- Couleur principale : modifier les variables `--color-cv-*` dans `@theme`.
-- Largeur de la sidebar : classe `grid-cols-[61mm_1fr]` sur `<main>`.
+## Contributing
 
-## Remarque impression
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-Chaque `.experience` utilise `break-inside: avoid` pour éviter qu'un poste soit coupé entre deux pages. Si le contenu devient trop long, le navigateur pourra créer une deuxième page lors de l'impression.
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
