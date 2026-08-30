@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* Satoshi — police variable locale (Fontshare / Indian Type Foundry).
+   NB : le CLI Tailwind ne réécrit pas les url(), elles sont donc
+   relatives au fichier généré ./dist/output.css, pas à ce fichier. */
+@font-face {
+    font-family: "Satoshi";
+    src: url("../src/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Variable.woff2") format("woff2-variations"),
+         url("../src/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-Variable.woff") format("woff-variations");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Satoshi";
+    src: url("../src/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-VariableItalic.woff2") format("woff2-variations"),
+         url("../src/fonts/Satoshi_Complete/Satoshi_Complete/Fonts/WEB/fonts/Satoshi-VariableItalic.woff") format("woff-variations");
+    font-weight: 300 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@theme {
+    --font-sans: Satoshi, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --color-cv-50: #f4f7fb;
+    --color-cv-100: #e9f0f8;
+    --color-cv-200: #cedcec;
+    --color-cv-500: #245ea9;
+    --color-cv-600: #174d94;
+    --color-cv-700: #103f7c;
+    --color-cv-900: #0a2854;
+}
+
+@layer base {
+    * { box-sizing: border-box; }
+
+    html {
+        background: #e9edf3;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    body {
+        margin: 0;
+        font-family: var(--font-sans);
+        color: #1f2937;
+        background: #e9edf3;
+    }
+
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+}
+
+@layer components {
+    .cv-page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 12mm auto;
+        background: white;
+        box-shadow: 0 20px 55px rgba(15, 23, 42, .16);
+        overflow: hidden;
+    }
+
+    .section-title {
+        @apply flex items-center gap-2 border-b border-cv-200 pb-1.5 text-[10px] font-bold uppercase tracking-[0.055em] text-cv-700;
+    }
+
+    .sidebar-title {
+        @apply flex items-center gap-2 border-b border-cv-200 pb-1.5 text-[9.5px] font-bold uppercase tracking-[0.055em] text-cv-700;
+    }
+
+    .icon-box {
+        @apply grid size-6 shrink-0 place-items-center rounded-md bg-cv-50 text-cv-600;
+    }
+
+    .experience {
+        @apply relative grid grid-cols-[84px_12px_1fr] gap-x-2 py-2;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .experience:not(:last-child) {
+        border-bottom: 1px dashed #d7dee8;
+    }
+
+    .timeline-line {
+        position: absolute;
+        left: 5.5px;
+        top: 15px;
+        bottom: -10px;
+        width: 1px;
+        background: #d9e2ef;
+    }
+
+    .experience:last-child .timeline-line { display: none; }
+
+    .skill-track {
+        @apply h-[3px] overflow-hidden rounded-full bg-slate-200;
+    }
+
+    .skill-value {
+        @apply h-full rounded-full bg-cv-600;
+    }
+}
+
+@media print {
+    html, body {
+        width: 210mm;
+        background: white !important;
+    }
+
+    .no-print { display: none !important; }
+
+    .cv-page {
+        margin: 0;
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+    }
+}

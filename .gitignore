@@ -1,0 +1,26 @@
+# Dépendances
+/node_modules
+/vendor
+
+# Environnement
+.env
+.env.backup
+.env.production
+
+# Build & stockage Laravel
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+.phpunit.result.cache
+/.phpunit.cache
+
+# IDE & OS
+/.idea
+/.vscode
+.DS_Store
+Thumbs.db
+
+# Divers
+/_prep/tmp
