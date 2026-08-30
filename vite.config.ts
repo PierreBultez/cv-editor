@@ -88,7 +88,9 @@ export default defineConfig({
             },
         }),
         tailwindcss(),
-        ui(),
+        // Sans cette option, Nuxt UI cible vue-router : ses composants de lien
+        // importent alors `useRoute`, absent d'une application Inertia.
+        ui({ router: 'inertia' }),
     ],
     resolve: {
         alias: {

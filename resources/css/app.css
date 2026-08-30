@@ -208,6 +208,17 @@
         width: 210mm;
         min-height: 297mm;
         box-shadow: none;
+    }
+
+    /* A4Frame reduit la feuille pour l'affichage : a l'impression elle doit
+       reprendre ses dimensions reelles. */
+    .cv-scale {
         transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .cv-scale-outer {
+        height: auto !important;
+        overflow: visible !important;
     }
 }
