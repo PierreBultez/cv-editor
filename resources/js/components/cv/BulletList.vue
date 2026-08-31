@@ -6,7 +6,7 @@ defineProps<{ items: string[] }>();
 <template>
     <ul class="mt-3 space-y-1 text-[8px] leading-[1.55] text-slate-700">
         <li v-for="(entry, index) in items" :key="index" class="flex gap-1.5">
-            <span :style="{ color: 'var(--cv-primary-600)' }">•</span>
+            <span class="cv-bullet">•</span>
             <span>{{ entry }}</span>
         </li>
     </ul>

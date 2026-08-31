@@ -31,7 +31,7 @@ const identity = computed(() => props.cv.content.identity);
         <!-- ================= Bandeau ================= -->
         <header
             class="flex items-center gap-[6mm] px-[12mm] py-[9mm]"
-            :style="{ background: 'var(--cv-primary-50)', borderBottom: '2px solid var(--cv-primary-600)' }"
+            :style="{ background: 'var(--cv-primary-50)', borderBottom: '2px solid var(--cv-accent-600)' }"
         >
             <CvPhotoFrame v-if="cv.photo" :photo="cv.photo" :alt="identity.fullName" size="5rem" />
 

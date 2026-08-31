@@ -220,12 +220,27 @@ async function describeFailure(response: Response): Promise<string> {
         return 'Trop de requêtes, réessayez dans un instant.';
     }
 
-    try {
-        const data = (await response.json()) as { message?: string; errors?: Record<string, string[]> };
-        const first = data.errors ? Object.values(data.errors)[0]?.[0] : undefined;
+    const text = await response.text().catch(() => '');
+    const data = parseJsonBody(text);
+    const first = data?.errors ? Object.values(data.errors)[0]?.[0] : undefined;
 
-        return first ?? data.message ?? `Erreur ${response.status}`;
-    } catch {
-        return `Erreur ${response.status}`;
+    return first ?? data?.message ?? `Erreur ${response.status}`;
+}
+
+/**
+ * PHP peut prefixer sa reponse d'un avertissement HTML — c'est le cas quand un
+ * upload echoue faute de repertoire temporaire. `response.json()` leve alors, et
+ * l'on perdait le message du serveur au profit d'un code HTTP nu, illisible pour
+ * l'utilisateur comme pour le diagnostic. On repart donc de la premiere accolade.
+ */
+function parseJsonBody(text: string): { message?: string; errors?: Record<string, string[]> } | null {
+    for (const candidate of [text, text.slice(text.indexOf('{'))]) {
+        try {
+            return JSON.parse(candidate);
+        } catch {
+            // On tente la variante suivante.
+        }
     }
+
+    return null;
 }

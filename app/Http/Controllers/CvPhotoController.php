@@ -20,6 +20,15 @@ class CvPhotoController extends Controller
         // n'est la que pour le cas ou l'appel arrive hors de l'interface.
         $validated = $request->validate([
             'photo' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,avif', 'max:8192', 'dimensions:max_width=6000,max_height=6000'],
+        ], [
+            'photo.required' => 'Aucune image reçue.',
+            'photo.image' => "Le fichier envoyé n'est pas une image.",
+            'photo.mimes' => 'Formats acceptés : JPEG, PNG, WebP et AVIF.',
+            'photo.max' => "L'image ne doit pas dépasser 8 Mo.",
+            'photo.dimensions' => "L'image ne doit pas dépasser 6000 px de côté.",
+            // Declenche quand PHP lui-meme n'a pas pu receptionner le fichier
+            // (repertoire temporaire absent, upload_max_filesize depasse).
+            'photo.uploaded' => "Le serveur n'a pas pu réceptionner l'image. Vérifiez sa taille, ou réessayez.",
         ]);
 
         $variants = $this->photos->process($validated['photo']->getRealPath(), $cv->photoDirectory());

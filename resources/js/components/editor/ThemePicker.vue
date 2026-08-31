@@ -55,7 +55,14 @@ function applyPreset(preset: { primary: string; accent: string }): void {
         </div>
 
         <div v-for="key in (['primary', 'accent'] as const)" :key="key" class="space-y-2">
-            <UFormField :label="key === 'primary' ? 'Couleur principale' : 'Couleur secondaire'">
+            <UFormField
+                :label="key === 'primary' ? 'Couleur principale' : 'Couleur secondaire'"
+                :description="
+                    key === 'primary'
+                        ? 'Titres, intitulés et fond de la colonne latérale.'
+                        : 'Barres de compétences, pastilles de langue et puces de liste.'
+                "
+            >
                 <div class="flex items-center gap-2">
                     <input
                         type="color"

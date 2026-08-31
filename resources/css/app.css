@@ -64,6 +64,8 @@
     background: white;
     color: var(--cv-ink);
     font-family: var(--cv-font-body);
+    /* Ecran uniquement : garde les angles de la feuille nets. Voir la regle
+       d'impression plus bas, ou cette declaration doit imperativement sauter. */
     overflow: hidden;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
@@ -98,6 +100,20 @@
 
 .cv-sidebar-title {
     font-size: 9.5px;
+}
+
+/* Un titre de section ne doit jamais rester seul en bas d'une page, et un
+   paragraphe ne doit pas laisser une ligne isolee de l'autre cote de la coupe. */
+.cv-section-title,
+.cv-sidebar-title {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.cv-page p,
+.cv-page li {
+    orphans: 2;
+    widows: 2;
 }
 
 .cv-icon-box {
@@ -156,6 +172,10 @@
    Compétences et langues
    -------------------------------------------------------------------------- */
 
+/* La couleur principale porte les titres et la structure ; la secondaire
+   marque tout ce qui exprime un niveau ou ponctue une liste. C'est ce partage
+   qui rend le second choix de couleur visible sur la feuille. */
+
 .cv-skill-track {
     height: 3px;
     overflow: hidden;
@@ -166,7 +186,7 @@
 .cv-skill-value {
     height: 100%;
     border-radius: 9999px;
-    background: var(--cv-primary-600);
+    background: var(--cv-accent-600);
 }
 
 .cv-dot {
@@ -177,7 +197,12 @@
 }
 
 .cv-dot--on {
-    background: var(--cv-primary-600);
+    background: var(--cv-accent-600);
+}
+
+/* Puces des listes « Outils » et « Centres d'intérêt ». */
+.cv-bullet {
+    color: var(--cv-accent-600);
 }
 
 /* --------------------------------------------------------------------------
@@ -208,6 +233,14 @@
         width: 210mm;
         min-height: 297mm;
         box-shadow: none;
+
+        /*
+         * Indispensable. En media pagine, une boite dont l'`overflow` n'est pas
+         * `visible` devient monolithique : le navigateur refuse de la couper
+         * entre deux pages. Un CV plus long qu'une page verrait alors tout ce
+         * qui depasse 297 mm purement disparaitre a l'impression.
+         */
+        overflow: visible;
     }
 
     /* A4Frame reduit la feuille pour l'affichage : a l'impression elle doit

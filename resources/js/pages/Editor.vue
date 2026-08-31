@@ -31,8 +31,16 @@ const copied = ref(false);
 const photoError = ref<string | null>(null);
 
 const TEMPLATE_OPTIONS = [
-    { label: 'Classique (colonne latérale)', value: 'classic' },
-    { label: 'Compacte (bandeau)', value: 'compact' },
+    {
+        label: 'Classique',
+        value: 'classic',
+        description: 'Colonne latérale colorée à gauche, contenu principal à droite.',
+    },
+    {
+        label: 'Compacte',
+        value: 'compact',
+        description: "Bandeau d'identité pleine largeur, puis deux colonnes.",
+    },
 ];
 
 function printCv(): void {
@@ -76,13 +84,6 @@ function destroy(): void {
                 <SaveIndicator :state="store.saveState" :error="store.lastError" />
 
                 <div class="ml-auto flex flex-wrap items-center gap-2">
-                    <USelect
-                        v-model="store.doc.template"
-                        :items="TEMPLATE_OPTIONS"
-                        size="sm"
-                        class="w-56"
-                        :disabled="readonly"
-                    />
                     <UButton
                         size="sm"
                         variant="subtle"
@@ -138,6 +139,16 @@ function destroy(): void {
                     </div>
 
                     <div v-else-if="tab === 'apparence'" class="space-y-6">
+                        <UCard>
+                            <template #header><span class="font-semibold">Mise en page</span></template>
+                            <URadioGroup
+                                v-model="store.doc.template"
+                                :items="TEMPLATE_OPTIONS"
+                                :disabled="readonly"
+                                variant="card"
+                            />
+                        </UCard>
+
                         <UCard>
                             <template #header><span class="font-semibold">Photo</span></template>
                             <PhotoUploader
@@ -214,7 +225,7 @@ function destroy(): void {
 
             <!-- Aperçu -->
             <div class="print-target lg:sticky lg:top-20 lg:self-start">
-                <A4Frame>
+                <A4Frame show-guides>
                     <CvPreview :cv="store.doc" />
                 </A4Frame>
             </div>

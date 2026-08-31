@@ -75,7 +75,7 @@ const identity = computed(() => props.cv.content.identity);
                     v-for="dot in 18"
                     :key="dot"
                     class="size-[2px] rounded-full"
-                    :style="{ background: 'var(--cv-primary-500)' }"
+                    :style="{ background: 'var(--cv-accent-500)' }"
                 />
             </div>
 
