@@ -94,6 +94,10 @@ Deux workflows GitHub Actions dans [`.github/workflows`](.github/workflows) :
 | `DEPLOY_PATH` | Racine de l'application sur le serveur |
 | `FPM_RELOAD_COMMAND` | Facultatif, ex. `sudo systemctl reload php8.4-fpm` |
 
+La première mise en production — dossier, base, `.env`, nginx, TLS, cron — est
+détaillée pas à pas dans [`deploy/SETUP.md`](deploy/SETUP.md), avec le bloc
+nginx dans [`deploy/nginx/`](deploy/nginx/).
+
 ### Prérequis serveur
 
 PHP 8.4 avec `gd` (ou `imagick`), `pdo_mysql`, `fileinfo`, `intl`, `mbstring` et
