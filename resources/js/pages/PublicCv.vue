@@ -17,12 +17,23 @@ function print(): void {
 <template>
     <Head :title="title" />
 
-    <div class="min-h-screen bg-[#e9edf3] py-[12mm]">
+    <!--
+        `print-canvas` / `print-target` neutralisent a l'impression le fond, les
+        marges et la largeur de cet habillage : sans eux, les 12 mm de padding
+        vertical et les 2 rem horizontaux decalent la feuille et la font
+        deborder sur une seconde page.
+    -->
+    <div class="print-canvas min-h-screen bg-[#e9edf3] py-[12mm]">
         <div class="no-print mx-auto mb-6 flex max-w-[210mm] justify-end gap-2 px-4">
             <UButton icon="i-lucide-printer" color="neutral" @click="print"> Imprimer / PDF </UButton>
         </div>
 
-        <div class="mx-auto max-w-[210mm] px-4">
+        <!--
+            La largeur maximale inclut le padding : en `border-box`, un
+            `max-w-[210mm]` avec `px-4` ne laisserait que 210 mm - 2 rem a la
+            feuille, qui serait donc affichee legerement reduite.
+        -->
+        <div class="print-target mx-auto max-w-[calc(210mm+2rem)] px-4">
             <A4Frame>
                 <CvPreview :cv="cv" />
             </A4Frame>

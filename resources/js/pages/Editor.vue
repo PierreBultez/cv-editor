@@ -73,7 +73,7 @@ function destroy(): void {
 <template>
     <Head title="Éditeur" />
 
-    <div v-if="store.doc" class="min-h-screen">
+    <div v-if="store.doc" class="print-canvas min-h-screen">
         <!-- ================= Barre d'outils ================= -->
         <header class="no-print sticky top-0 z-20 border-b border-default bg-default/95 backdrop-blur">
             <div class="flex flex-wrap items-center gap-2 px-4 py-3">

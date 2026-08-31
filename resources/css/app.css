@@ -228,6 +228,17 @@
         display: none !important;
     }
 
+    /*
+     * Rien de flottant ne doit atteindre le papier. Nuxt UI monte en permanence
+     * un conteneur de notifications en `position: fixed`, cale en bas a droite
+     * de la fenetre : meme vide, il se place hors de la feuille et suffit a
+     * produire une page supplementaire a l'impression.
+     */
+    .fixed,
+    [data-slot='viewport'] {
+        display: none !important;
+    }
+
     .cv-page {
         margin: 0;
         width: 210mm;
@@ -255,12 +266,23 @@
         overflow: visible !important;
     }
 
-    /* Imprimer depuis l'editeur ne doit sortir que la feuille : le formulaire
-       porte `no-print`, il reste a neutraliser la grille qui les separe. */
+    /*
+     * Ne doit sortir que la feuille. Le reste de l'interface porte `no-print`,
+     * mais les conteneurs qui l'habillent restent dans le flux : leurs marges,
+     * leur fond et leur hauteur minimale decaleraient la feuille et la
+     * pousseraient sur une seconde page.
+     *
+     * `print-canvas` marque tout conteneur enveloppant, `print-target` celui
+     * qui porte directement la feuille. Les deux pages qui affichent un CV
+     * (editeur et page publique) doivent les poser.
+     */
     .print-canvas {
         display: block !important;
         gap: 0 !important;
         padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        min-height: 0 !important;
     }
 
     .print-target {
@@ -269,5 +291,6 @@
         max-width: none !important;
         margin: 0 !important;
         padding: 0 !important;
+        background: white !important;
     }
 }
