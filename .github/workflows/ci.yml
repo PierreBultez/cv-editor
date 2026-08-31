@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests et qualité
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # Même version majeure que le serveur de production (PHP 8.4).
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, sqlite3, pdo_sqlite, fileinfo, zip, intl, mbstring, curl
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Préparer l'environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Style PHP
+        run: ./vendor/bin/pint --test
+
+      # Les tests tournent sur SQLite en mémoire (phpunit.xml) : rapide, et
+      # suffisant pour la logique. La compatibilité du schéma avec MariaDB est
+      # vérifiée par le job « migrations » ci-dessous.
+      - name: Tests
+        run: php artisan test
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typage
+        run: npm run typecheck
+
+      # Le build télécharge et auto-héberge les polices : il valide donc aussi
+      # que le catalogue déclaré dans vite.config.ts est bien résolvable.
+      - name: Build des assets
+        run: npm run build
+
+  migrations:
+    name: Migrations sur MariaDB
+    runs-on: ubuntu-latest
+
+    # La production n'a ni sqlite3 ni pdo_sqlite : le schéma doit être validé
+    # sur le moteur réellement utilisé, sans quoi une incompatibilité ne se
+    # découvrirait qu'au déploiement.
+    services:
+      mariadb:
+        image: mariadb:11.8
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: cv_studio
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, pdo_mysql, mysqli, fileinfo, zip, intl, mbstring
+          coverage: none
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Préparer l'environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Migrer et semer sur MariaDB
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: cv_studio
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --force
+          php artisan migrate:rollback --force

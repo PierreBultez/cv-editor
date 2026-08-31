@@ -73,6 +73,69 @@ Le CV de démonstration est servi sur `/cv/01K0DEMXCV0000000000000000`.
 php artisan test
 ```
 
+## Déploiement
+
+Deux workflows GitHub Actions dans [`.github/workflows`](.github/workflows) :
+
+- **`ci.yml`** — Pint, Pest, typage et build à chaque push. Un second job rejoue
+  les migrations sur **MariaDB 11.8**, parce que la production n'a ni `sqlite3`
+  ni `pdo_sqlite` : une incompatibilité de schéma se découvrirait sinon au
+  déploiement.
+- **`deploy.yml`** — se déclenche seulement si la CI est verte. Les dépendances
+  PHP et les assets sont compilés dans la CI puis expédiés par `rsync`, ce qui
+  évite d'exiger Composer ou Node sur le serveur.
+
+### Secrets à définir
+
+| Secret | Rôle |
+|---|---|
+| `SSH_HOST`, `SSH_USER`, `SSH_PORT` | Connexion au serveur |
+| `SSH_PRIVATE_KEY` | Clé privée dédiée au déploiement |
+| `DEPLOY_PATH` | Racine de l'application sur le serveur |
+| `FPM_RELOAD_COMMAND` | Facultatif, ex. `sudo systemctl reload php8.4-fpm` |
+
+### Prérequis serveur
+
+PHP 8.4 avec `gd` (ou `imagick`), `pdo_mysql`, `fileinfo`, `intl`, `mbstring` et
+`zip` ; MariaDB ou MySQL ; nginx dont la racine pointe sur `public/`.
+
+À faire une fois, à la main :
+
+```bash
+cp .env.example .env && php artisan key:generate && php artisan storage:link
+```
+
+Dans `.env` : `APP_ENV=production`, **`APP_DEBUG=false`**, `APP_URL`, et les
+identifiants `DB_*`. Le mode debug n'est pas qu'une question de confort — c'est
+l'affichage des avertissements PHP qui rend les réponses JSON illisibles côté
+client.
+
+La purge des CV inactifs passe par l'ordonnanceur, à déclarer dans le cron de
+l'utilisateur qui sert le site :
+
+```bash
+* * * * * cd /chemin/vers/le/site && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### AVIF en production
+
+Le pilote d'image se choisit dans `.env` :
+
+```bash
+CV_IMAGE_DRIVER=imagick
+```
+
+`gd` reste la valeur par défaut. Basculer sur `imagick` a du sens lorsque GD n'a
+pas été compilé avec libavif alors qu'Imagick dispose de libheif. Une extension
+demandée mais absente ne met rien en panne : le service enregistre un
+avertissement, revient à GD, et l'AVIF est simplement omis.
+
+Pour savoir ce dont dispose l'hôte :
+
+```bash
+php -r 'var_dump(function_exists("imageavif"), extension_loaded("imagick") ? Imagick::queryFormats("AVIF") : "imagick absent");'
+```
+
 ## Points d'architecture
 
 **Le thème est du CSS, pas un build.** `resources/js/lib/palette.ts` dérive une

@@ -16,14 +16,14 @@ use Illuminate\Console\Command;
  */
 class PurgeStaleCvs extends Command
 {
-    protected $signature = 'cv:purge {--months=12 : Ancienneté au-delà de laquelle un CV est supprimé}
+    protected $signature = 'cv:purge {--months= : Ancienneté au-delà de laquelle un CV est supprimé (défaut : cv.retention_months)}
                                      {--dry-run : Affiche ce qui serait supprimé sans rien effacer}';
 
     protected $description = 'Supprime les CV inactifs et leurs photos';
 
     public function handle(PhotoProcessor $photos): int
     {
-        $months = max(1, (int) $this->option('months'));
+        $months = max(1, (int) ($this->option('months') ?: config('cv.retention_months')));
         $threshold = now()->subMonths($months);
         $dryRun = (bool) $this->option('dry-run');
 

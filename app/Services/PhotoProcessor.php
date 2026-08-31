@@ -7,11 +7,13 @@ namespace App\Services;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\Encoders\AvifEncoder;
 use Intervention\Image\Encoders\JpegEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\DriverInterface;
 use Intervention\Image\Interfaces\EncoderInterface;
 use Intervention\Image\Interfaces\ImageInterface;
 use Throwable;
@@ -34,7 +36,32 @@ final class PhotoProcessor
 
     public function __construct()
     {
-        $this->manager = new ImageManager(new Driver);
+        $this->manager = new ImageManager(self::driver());
+    }
+
+    private static function driver(): DriverInterface
+    {
+        return self::usesImagick() ? new ImagickDriver : new GdDriver;
+    }
+
+    /**
+     * Pilote reellement utilise, et non celui demande : une configuration
+     * pointant vers une extension absente doit priver d'AVIF, jamais mettre
+     * l'envoi de photo hors service.
+     */
+    private static function usesImagick(): bool
+    {
+        if (config('cv.image_driver') !== 'imagick') {
+            return false;
+        }
+
+        if (extension_loaded('imagick')) {
+            return true;
+        }
+
+        Log::warning("Pilote d'image « imagick » demandé mais l'extension est absente : repli sur GD.");
+
+        return false;
     }
 
     /**
@@ -84,11 +111,16 @@ final class PhotoProcessor
     }
 
     /**
-     * GD n'expose `imageavif()` que s'il a ete compile avec libavif. Le PHP de
-     * Herd le fournit, un hote de production ne le garantit pas.
+     * L'AVIF depend de la compilation de l'hote, pas de la version de PHP : GD
+     * doit avoir ete bati avec libavif, Imagick avec libheif. On interroge donc
+     * le pilote reellement configure.
      */
     public static function supportsAvif(): bool
     {
+        if (self::usesImagick()) {
+            return in_array('AVIF', \Imagick::queryFormats('AVIF'), true);
+        }
+
         return function_exists('imageavif');
     }
 
