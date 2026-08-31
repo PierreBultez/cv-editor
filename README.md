@@ -119,18 +119,21 @@ l'utilisateur qui sert le site :
 
 ### AVIF en production
 
-Le pilote d'image se choisit dans `.env` :
+L'AVIF dépend de la compilation de l'hôte, pas de la version de PHP : libavif
+pour GD, libheif pour Imagick. Les deux ne vont pas ensemble.
+
+**Sur le serveur de production, GD n'a pas l'AVIF mais Imagick l'a.** Le `.env`
+de production doit donc porter :
 
 ```bash
 CV_IMAGE_DRIVER=imagick
 ```
 
-`gd` reste la valeur par défaut. Basculer sur `imagick` a du sens lorsque GD n'a
-pas été compilé avec libavif alors qu'Imagick dispose de libheif. Une extension
-demandée mais absente ne met rien en panne : le service enregistre un
-avertissement, revient à GD, et l'AVIF est simplement omis.
+`gd` reste la valeur par défaut, adaptée au poste de développement. Une
+extension demandée mais absente ne met rien en panne : le service enregistre un
+avertissement, revient à GD, et l'AVIF est simplement omis du `<picture>`.
 
-Pour savoir ce dont dispose l'hôte :
+Pour vérifier ce dont dispose un hôte :
 
 ```bash
 php -r 'var_dump(function_exists("imageavif"), extension_loaded("imagick") ? Imagick::queryFormats("AVIF") : "imagick absent");'

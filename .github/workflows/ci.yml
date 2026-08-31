@@ -64,6 +64,40 @@ jobs:
       - name: Build des assets
         run: npm run build
 
+  photos-imagick:
+    name: Pipeline photo sous Imagick
+    runs-on: ubuntu-latest
+
+    # La production sert les photos via Imagick : son GD n'a pas ete compile
+    # avec libavif, contrairement a son Imagick. Le chemin Imagick n'etant pas
+    # exercable sur un poste sans cette extension, c'est ici qu'il est verifie.
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Installer PHP avec Imagick
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: imagick, gd, sqlite3, pdo_sqlite, fileinfo, zip, intl, mbstring
+          coverage: none
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Préparer l'environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Formats disponibles
+        run: |
+          php -r 'printf("GD AVIF     : %s\n", function_exists("imageavif") ? "oui" : "non");'
+          php -r 'printf("Imagick AVIF: %s\n", in_array("AVIF", Imagick::queryFormats("AVIF"), true) ? "oui" : "non");'
+
+      - name: Tests du pipeline photo
+        env:
+          CV_IMAGE_DRIVER: imagick
+        run: php artisan test --filter=Photo
+
   migrations:
     name: Migrations sur MariaDB
     runs-on: ubuntu-latest
