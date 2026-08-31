@@ -39,6 +39,35 @@ function write(entries: StoredCv[]): void {
     }
 }
 
+/**
+ * Absorbe un lien de modification de la forme `/cv/{id}/edit#t={jeton}`.
+ *
+ * A appeler avant l'initialisation d'Inertia : le routeur reecrit l'URL a son
+ * demarrage et remettrait un fragment efface plus tard. Le jeton est range dans
+ * le trousseau, puis retire de la barre d'adresse pour ne pas trainer dans
+ * l'historique du navigateur ni s'afficher par-dessus l'epaule.
+ *
+ * Le fragment n'etant jamais transmis au serveur, le jeton n'apparait ni dans
+ * les journaux d'acces ni dans un en-tete Referer.
+ */
+export function absorbRecoveryLink(): void {
+    const token = window.location.hash.match(/(?:^|[#&])t=([A-Za-z0-9]+)/)?.[1];
+    const publicId = window.location.pathname.match(/^\/cv\/([A-Za-z0-9]+)\/edit$/)?.[1];
+
+    if (!token || !publicId) {
+        return;
+    }
+
+    // Le libelle sera corrige des que l'editeur connaitra le nom du CV.
+    rememberCv(publicId, token, 'CV');
+
+    window.history.replaceState(
+        window.history.state,
+        '',
+        window.location.pathname + window.location.search,
+    );
+}
+
 export function listCvs(): StoredCv[] {
     return read().sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''));
 }

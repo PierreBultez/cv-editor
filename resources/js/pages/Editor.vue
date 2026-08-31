@@ -18,16 +18,30 @@ const props = defineProps<{
     supportsAvif: boolean;
 }>();
 
+// Un lien de modification a deja ete absorbe au demarrage de l'application
+// (voir absorbRecoveryLink) : le jeton est donc dans le trousseau local, et
+// `initialise` l'y retrouve comme pour n'importe quelle visite ulterieure.
 const store = useCvStore();
 store.initialise(props.cv, props.issuedToken);
 
 const readonly = computed(() => !store.canEdit);
 const publicUrl = computed(() => `${window.location.origin}/cv/${props.cv.public_id}`);
 
+/**
+ * Sans comptes, ce lien est le seul moyen de revenir modifier ce CV : il n'est
+ * rattache a aucune adresse e-mail et le serveur n'en conserve que le hachage.
+ */
+const editUrl = computed(() =>
+    store.token ? `${window.location.origin}/cv/${props.cv.public_id}/edit#t=${store.token}` : null,
+);
+
 const tab = ref('contenu');
 const mobileTab = ref('editer');
 const confirmDelete = ref(false);
 const copied = ref(false);
+const copiedEdit = ref(false);
+/** Bandeau affiche au retour immediat de la creation, tant qu'il n'est pas ecarte. */
+const showKeepLink = ref(props.issuedToken !== null);
 const photoError = ref<string | null>(null);
 
 const TEMPLATE_OPTIONS = [
@@ -51,6 +65,38 @@ async function copyLink(): Promise<void> {
     await navigator.clipboard.writeText(publicUrl.value);
     copied.value = true;
     setTimeout(() => (copied.value = false), 2000);
+}
+
+async function copyEditLink(): Promise<void> {
+    if (!editUrl.value) {
+        return;
+    }
+
+    await navigator.clipboard.writeText(editUrl.value);
+    copiedEdit.value = true;
+    setTimeout(() => (copiedEdit.value = false), 2000);
+}
+
+/**
+ * Raccourci Internet : double-cliquer le fichier rouvre l'editeur avec le
+ * jeton. C'est le filet pour qui vide les donnees de son navigateur ou change
+ * de machine.
+ */
+function downloadEditLink(): void {
+    if (!editUrl.value) {
+        return;
+    }
+
+    const nom = store.doc?.content.identity.fullName.trim() || 'CV';
+    const blob = new Blob([`[InternetShortcut]\r\nURL=${editUrl.value}\r\n`], {
+        type: 'application/internet-shortcut',
+    });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `Modifier mon CV — ${nom}.url`;
+    a.click();
+    URL.revokeObjectURL(a.href);
 }
 
 async function onPhotoUpload(blob: Blob): Promise<void> {
@@ -105,8 +151,44 @@ function destroy(): void {
             variant="subtle"
             icon="i-lucide-lock"
             title="Lecture seule"
-            description="Le jeton d'édition de ce CV n'a pas été trouvé dans ce navigateur. Vous pouvez consulter le CV, mais pas le modifier."
+            description="Ce navigateur ne détient pas le lien de modification de ce CV. Vous pouvez le consulter, mais pas le modifier. Si vous aviez conservé votre lien de modification, ouvrez-le : il rétablit l'accès."
         />
+
+        <!--
+            Sans comptes, ce lien est le seul chemin de retour vers ce CV. Le
+            dire au moment ou il est encore temps evite la seule perte
+            irreversible que le modele autorise.
+        -->
+        <UAlert
+            v-if="showKeepLink && editUrl"
+            class="no-print m-4"
+            color="primary"
+            variant="subtle"
+            icon="i-lucide-key-round"
+            title="Conservez votre lien de modification"
+            :close="true"
+            @update:open="showKeepLink = false"
+        >
+            <template #description>
+                <p class="mb-3">
+                    Il n'y a ni compte ni mot de passe : ce lien secret est le seul moyen de revenir modifier ce
+                    CV. Il est enregistré dans ce navigateur, mais vider les données du site ou changer d'appareil
+                    vous en ferait perdre l'accès — définitivement.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <UButton
+                        size="sm"
+                        :icon="copiedEdit ? 'i-lucide-check' : 'i-lucide-copy'"
+                        @click="copyEditLink"
+                    >
+                        {{ copiedEdit ? 'Copié' : 'Copier le lien' }}
+                    </UButton>
+                    <UButton size="sm" variant="subtle" icon="i-lucide-download" @click="downloadEditLink">
+                        Enregistrer le raccourci
+                    </UButton>
+                </div>
+            </template>
+        </UAlert>
 
         <!-- ================= Deux volets ================= -->
         <div class="print-canvas grid gap-6 p-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
@@ -199,7 +281,35 @@ function destroy(): void {
                                     />
                                 </UFormField>
 
-                                <UInput :model-value="publicUrl" readonly class="font-mono text-xs" />
+                                <UFormField label="Lien public" description="À transmettre à un recruteur.">
+                                    <UInput :model-value="publicUrl" readonly class="font-mono text-xs" />
+                                </UFormField>
+                            </div>
+                        </UCard>
+
+                        <UCard v-if="editUrl">
+                            <template #header>
+                                <span class="font-semibold">Lien de modification</span>
+                            </template>
+
+                            <p class="mb-3 text-sm text-muted">
+                                Secret. Quiconque l'ouvre peut modifier ce CV. Gardez-le pour vous, mais gardez-le :
+                                c'est le seul moyen de revenir ici depuis un autre navigateur.
+                            </p>
+
+                            <UInput :model-value="editUrl" readonly class="mb-3 font-mono text-xs" />
+
+                            <div class="flex flex-wrap gap-2">
+                                <UButton
+                                    size="sm"
+                                    :icon="copiedEdit ? 'i-lucide-check' : 'i-lucide-copy'"
+                                    @click="copyEditLink"
+                                >
+                                    {{ copiedEdit ? 'Copié' : 'Copier' }}
+                                </UButton>
+                                <UButton size="sm" variant="subtle" icon="i-lucide-download" @click="downloadEditLink">
+                                    Enregistrer le raccourci
+                                </UButton>
                             </div>
                         </UCard>
 

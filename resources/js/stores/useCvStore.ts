@@ -47,6 +47,13 @@ export const useCvStore = defineStore('cv', () => {
             rememberCv(record.public_id, issuedToken, documentTitle(record));
         } else {
             token.value = tokenFor(record.public_id);
+
+            // Rafraichit le libelle de la liste « Mes CV » a chaque ouverture.
+            // C'est aussi ce qui remplace le titre provisoire pose par
+            // absorbRecoveryLink, qui ne connait pas encore le nom du CV.
+            if (token.value) {
+                touchCv(record.public_id, documentTitle(record));
+            }
         }
 
         saveState.value = canEdit.value ? 'idle' : 'readonly';
