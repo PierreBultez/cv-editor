@@ -55,6 +55,12 @@ sudo usermod -aG pierre www-data
 sudo chmod 750 /var/www/cv
 ```
 
+`storage/` est exclu du `rsync` — il porte les photos et les journaux, qui
+appartiennent au serveur, pas au dépôt. Son squelette est donc créé par le
+workflow de déploiement à chaque passage. C'est nécessaire : sans
+`storage/framework/views`, `artisan optimize` échoue sur un « View path not
+found » qui ne désigne pas `resources/views` mais `config('view.compiled')`.
+
 ## 4. Base de données
 
 ```bash
