@@ -70,6 +70,21 @@ it('rejette un niveau de competence hors bornes', function () {
         ->assertStatus(422);
 });
 
+/**
+ * USlider renvoie un tableau a un element : sans normalisation cote client, le
+ * niveau partait sous la forme `[55]` et toute sauvegarde echouait des qu'un
+ * curseur etait touche. La normalisation vit dans SectionItemsEditor ; ce test
+ * fige la contrepartie serveur, pour que le relachement de la regle ne puisse
+ * pas masquer un retour du bug.
+ */
+it('rejette un niveau envoyé sous forme de tableau', function () {
+    ($this->patchCv)(['content' => withItems('skills', [['label' => 'PHP', 'level' => [55]]])])
+        ->assertStatus(422);
+
+    ($this->patchCv)(['content' => withItems('languages', [['label' => 'Anglais', 'mention' => 'B1', 'level' => [3]]])])
+        ->assertStatus(422);
+});
+
 it('rejette une section depassant la limite d items', function () {
     $items = array_fill(0, CvDefaults::MAX_ITEMS_PER_SECTION + 5, 'Marche');
 

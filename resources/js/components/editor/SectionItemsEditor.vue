@@ -44,6 +44,22 @@ function asLanguage(item: unknown): LanguageItem {
     return item as LanguageItem;
 }
 
+/**
+ * `USlider` renvoie un tableau a un element des qu'on le manipule — il est bati
+ * sur un curseur multi-poignees. Un `v-model` direct remplacerait donc le
+ * niveau (un entier) par `[55]`, que le serveur refuse : la sauvegarde
+ * automatique echouait des la premiere modification d'un curseur.
+ *
+ * On normalise ici plutot que de faire confiance a la forme rendue par la
+ * bibliotheque, et l'arrondi protege au passage d'une valeur flottante.
+ */
+function toLevel(value: unknown): number {
+    const raw = Array.isArray(value) ? value[0] : value;
+    const parsed = Math.round(Number(raw));
+
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
 const ADD_LABELS: Record<string, string> = {
     experiences: 'Ajouter une expérience',
     education: 'Ajouter une formation',
@@ -171,7 +187,14 @@ const ADD_LABELS: Record<string, string> = {
             <div v-else-if="section.type === 'skills'" class="space-y-2">
                 <UInput v-model="asSkill(item).label" :disabled="disabled" placeholder="Backend : PHP, Laravel…" />
                 <div class="flex items-center gap-3">
-                    <USlider v-model="asSkill(item).level" :min="0" :max="100" :step="5" :disabled="disabled" />
+                    <USlider
+                        :model-value="asSkill(item).level"
+                        :min="0"
+                        :max="100"
+                        :step="5"
+                        :disabled="disabled"
+                        @update:model-value="asSkill(item).level = toLevel($event)"
+                    />
                     <span class="w-10 shrink-0 text-right text-xs tabular-nums text-muted">
                         {{ asSkill(item).level }}%
                     </span>
@@ -185,7 +208,14 @@ const ADD_LABELS: Record<string, string> = {
                     <UInput v-model="asLanguage(item).mention" :disabled="disabled" placeholder="B1 — Intermédiaire" />
                 </div>
                 <div class="flex items-center gap-3">
-                    <USlider v-model="asLanguage(item).level" :min="0" :max="5" :step="1" :disabled="disabled" />
+                    <USlider
+                        :model-value="asLanguage(item).level"
+                        :min="0"
+                        :max="5"
+                        :step="1"
+                        :disabled="disabled"
+                        @update:model-value="asLanguage(item).level = toLevel($event)"
+                    />
                     <span class="w-10 shrink-0 text-right text-xs tabular-nums text-muted">
                         {{ asLanguage(item).level }}/5
                     </span>
