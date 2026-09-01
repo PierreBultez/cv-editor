@@ -120,7 +120,7 @@ const ADD_LABELS: Record<string, string> = {
 
             <!-- Expériences -->
             <div v-if="section.type === 'experiences'" class="space-y-2">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <UFormField label="Période" size="sm">
                         <UInput v-model="asExperience(item).period" :disabled="disabled" placeholder="2020 — 2022" />
                     </UFormField>
@@ -174,7 +174,7 @@ const ADD_LABELS: Record<string, string> = {
 
             <!-- Formations et certifications -->
             <div v-else-if="section.type === 'education' || section.type === 'certifications'" class="space-y-2">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <UFormField label="Période" size="sm">
                         <UInput v-model="asDiploma(item).period" :disabled="disabled" placeholder="2025" />
                     </UFormField>
@@ -198,6 +198,7 @@ const ADD_LABELS: Record<string, string> = {
                 <UInput v-model="asSkill(item).label" :disabled="disabled" placeholder="Backend : PHP, Laravel…" />
                 <div class="flex items-center gap-3">
                     <USlider
+                        class="min-w-0 flex-1"
                         :model-value="asSkill(item).level"
                         :min="0"
                         :max="100"

@@ -83,11 +83,20 @@ function removeContact(index: number): void {
 
         <UFormField label="Coordonnées">
             <div class="space-y-2">
-                <div v-for="(contact, index) in content.contact" :key="index" class="flex gap-2">
+                <!--
+                    Sous 640 px, le type passe au-dessus de la valeur : cote a
+                    cote, les 144 px du selecteur ne laissaient a l'adresse
+                    e-mail qu'une fenetre de saisie de quelques caracteres.
+                -->
+                <div
+                    v-for="(contact, index) in content.contact"
+                    :key="index"
+                    class="flex flex-wrap items-start gap-2 sm:flex-nowrap"
+                >
                     <USelect
                         v-model="contact.type"
                         :items="TYPE_OPTIONS"
-                        class="w-36 shrink-0"
+                        class="w-full sm:w-36 sm:shrink-0"
                         :disabled="disabled"
                     />
                     <UInput
@@ -101,6 +110,7 @@ function removeContact(index: number): void {
                         variant="ghost"
                         color="error"
                         icon="i-lucide-x"
+                        aria-label="Retirer cette coordonnée"
                         :disabled="disabled"
                         @click="removeContact(index)"
                     />

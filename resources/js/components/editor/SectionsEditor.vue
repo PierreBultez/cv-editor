@@ -44,57 +44,70 @@ function toggleColumn(section: CvSection): void {
         >
             <template #item="{ element, index }">
                 <div class="rounded-lg border border-default">
-                    <div class="flex items-center gap-2 border-b border-default px-3 py-2">
-                        <UIcon
-                            name="i-lucide-grip-vertical"
-                            class="section-handle size-4 shrink-0 cursor-grab text-muted"
-                        />
+                    <!--
+                        Sept elements sur une rangee ne tiennent pas dans 320 px :
+                        le titre s'y reduisait a deux caracteres. Le groupe
+                        d'actions passe donc sous le titre quand la place manque.
+                    -->
+                    <div class="flex flex-wrap items-center gap-2 border-b border-default px-2 py-2 sm:px-3">
+                        <!-- La poignee est cliquable au doigt : 16 px d'icone, 36 px de cible. -->
+                        <span
+                            class="section-handle -m-1.5 flex size-9 shrink-0 cursor-grab touch-none items-center justify-center text-muted"
+                            aria-label="Déplacer la section"
+                        >
+                            <UIcon name="i-lucide-grip-vertical" class="size-4" />
+                        </span>
                         <UIcon :name="sectionLucideIcon(element.type)" class="size-4 shrink-0 text-muted" />
 
                         <UInput
                             v-model="element.title"
                             variant="none"
-                            class="min-w-0 flex-1 font-medium"
+                            class="min-w-32 flex-1 font-medium"
                             :disabled="disabled"
                         />
 
-                        <UBadge size="sm" variant="subtle" color="neutral">
-                            {{ element.items.length }}
-                        </UBadge>
+                        <div class="ml-auto flex shrink-0 items-center gap-1">
+                            <UBadge size="sm" variant="subtle" color="neutral">
+                                {{ element.items.length }}
+                            </UBadge>
 
-                        <UTooltip v-if="showColumns" :text="element.column === 'sidebar' ? 'Colonne latérale' : 'Colonne principale'">
+                            <UTooltip v-if="showColumns" :text="element.column === 'sidebar' ? 'Colonne latérale' : 'Colonne principale'">
+                                <UButton
+                                    size="xs"
+                                    variant="ghost"
+                                    color="neutral"
+                                    :icon="element.column === 'sidebar' ? 'i-lucide-panel-left' : 'i-lucide-square'"
+                                    :aria-label="element.column === 'sidebar' ? 'Colonne latérale' : 'Colonne principale'"
+                                    :disabled="disabled"
+                                    @click="toggleColumn(element)"
+                                />
+                            </UTooltip>
+
+                            <UTooltip :text="element.enabled ? 'Masquer du CV' : 'Afficher dans le CV'">
+                                <UButton
+                                    size="xs"
+                                    variant="ghost"
+                                    color="neutral"
+                                    :icon="element.enabled ? 'i-lucide-eye' : 'i-lucide-eye-off'"
+                                    :aria-label="element.enabled ? 'Masquer du CV' : 'Afficher dans le CV'"
+                                    :disabled="disabled"
+                                    @click="element.enabled = !element.enabled"
+                                />
+                            </UTooltip>
+
                             <UButton
                                 size="xs"
                                 variant="ghost"
-                                color="neutral"
-                                :icon="element.column === 'sidebar' ? 'i-lucide-panel-left' : 'i-lucide-square'"
+                                color="error"
+                                icon="i-lucide-trash-2"
+                                aria-label="Supprimer la section"
                                 :disabled="disabled"
-                                @click="toggleColumn(element)"
+                                @click="removeSection(index)"
                             />
-                        </UTooltip>
-
-                        <UTooltip :text="element.enabled ? 'Masquer du CV' : 'Afficher dans le CV'">
-                            <UButton
-                                size="xs"
-                                variant="ghost"
-                                color="neutral"
-                                :icon="element.enabled ? 'i-lucide-eye' : 'i-lucide-eye-off'"
-                                :disabled="disabled"
-                                @click="element.enabled = !element.enabled"
-                            />
-                        </UTooltip>
-
-                        <UButton
-                            size="xs"
-                            variant="ghost"
-                            color="error"
-                            icon="i-lucide-trash-2"
-                            :disabled="disabled"
-                            @click="removeSection(index)"
-                        />
+                        </div>
                     </div>
 
-                    <div class="p-3" :class="{ 'opacity-50': !element.enabled }">
+                    <div class="p-2 sm:p-3" :class="{ 'opacity-50': !element.enabled }">
                         <SectionItemsEditor :section="element" :disabled="disabled" />
                     </div>
                 </div>

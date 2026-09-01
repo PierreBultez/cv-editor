@@ -385,8 +385,17 @@ h3,
     /* A4Frame reduit la feuille pour l'affichage : a l'impression elle doit
        reprendre ses dimensions reelles. */
     .cv-scale {
+        /* Sorti du flux a l'ecran pour que le cadre mesure la feuille *reduite*
+           et non ses 794 px reels ; a l'impression il faut l'y remettre, sans
+           quoi la feuille se superpose au reste et ne se pagine plus. */
+        position: static !important;
         transform: none !important;
         box-shadow: none !important;
+    }
+
+    .cv-scale-box {
+        width: auto !important;
+        height: auto !important;
     }
 
     .cv-scale-outer {
@@ -414,6 +423,13 @@ h3,
     }
 
     .print-target {
+        /*
+         * L'editeur masque l'un des deux volets sur telephone : le volet
+         * d'apercu porte alors `hidden`, soit du `display: none`, que
+         * `no-print` ne defait pas. Sans ce retablissement, imprimer depuis un
+         * mobile sortirait une page blanche.
+         */
+        display: block !important;
         position: static !important;
         width: 210mm !important;
         max-width: none !important;
