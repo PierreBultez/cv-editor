@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, router, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import CiviLogo from '@/components/CiviLogo.vue';
 
 const creating = ref(false);
 const page = usePage();
@@ -17,7 +18,7 @@ function createCv(): void {
     <div class="min-h-screen">
         <header class="border-b border-default">
             <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-                <span class="text-lg font-bold">CV Studio</span>
+                <CiviLogo />
                 <UButton to="/mes-cv" variant="ghost" color="neutral" icon="i-lucide-folder">Mes CV</UButton>
             </div>
         </header>
@@ -31,8 +32,9 @@ function createCv(): void {
                 :description="String(page.props.flash.status)"
             />
 
-            <h1 class="max-w-2xl text-4xl font-black leading-tight sm:text-5xl">
-                Un CV propre, prêt à imprimer, en quelques minutes.
+            <h1 class="max-w-3xl text-4xl font-extrabold leading-tight sm:text-5xl">
+                Faites votre CV,<br class="hidden sm:inline" />
+                pas votre mise en page.
             </h1>
 
             <p class="mt-5 max-w-2xl text-lg text-muted">

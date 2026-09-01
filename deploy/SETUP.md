@@ -138,7 +138,7 @@ php artisan key:generate
 Puis éditez `.env` :
 
 ```bash
-APP_NAME="CV Studio"
+APP_NAME="Civi"
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://cv.pierrebultez.com

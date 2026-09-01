@@ -1,4 +1,4 @@
-# CV Studio
+# Civi
 
 Générateur de CV en ligne : on remplit ses expériences, ses formations et ses
 compétences, on choisit deux couleurs et deux polices, on ajoute sa photo, et

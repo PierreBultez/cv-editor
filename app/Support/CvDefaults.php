@@ -23,6 +23,7 @@ final class CvDefaults
      */
     public const FONTS = [
         'satoshi',
+        'poppins',
         'inter',
         'outfit',
         'space-grotesk',

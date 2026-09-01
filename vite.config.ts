@@ -19,6 +19,20 @@ import ui from '@nuxt/ui/vite';
  * famille que lorsqu'elle est réellement appliquée dans l'aperçu.
  */
 const cvFonts = [
+    /*
+     * Poppins porte l'identité de Civi : titres en ExtraBold, sous-titres en
+     * SemiBold. Préchargée, contrairement aux polices du catalogue : elle est
+     * présente sur chaque page de l'application.
+     *
+     * Le provider `bunny` télécharge les fichiers au build et les émet dans
+     * public/build : ils sont donc servis depuis notre propre domaine, sans
+     * aucune requête vers un tiers à l'exécution.
+     */
+    bunny('Poppins', {
+        alias: 'poppins',
+        weights: [400, 500, 600, 700, 800],
+        fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+    }),
     local('Satoshi', {
         alias: 'satoshi',
         variants: [
@@ -88,9 +102,18 @@ export default defineConfig({
             },
         }),
         tailwindcss(),
-        // Sans cette option, Nuxt UI cible vue-router : ses composants de lien
+        // Sans `router`, Nuxt UI cible vue-router : ses composants de lien
         // importent alors `useRoute`, absent d'une application Inertia.
-        ui({ router: 'inertia' }),
+        // `colors.primary` pointe vers l'échelle `civi` définie dans app.css.
+        ui({
+            router: 'inertia',
+            ui: {
+                colors: {
+                    primary: 'civi',
+                    neutral: 'zinc',
+                },
+            },
+        }),
     ],
     resolve: {
         alias: {

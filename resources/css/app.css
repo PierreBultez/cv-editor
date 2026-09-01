@@ -5,11 +5,82 @@
 @source '../../storage/framework/views/*.php';
 
 /* ==========================================================================
-   Interface de l'outil (hors aperçu CV)
+   Identité de marque — Civi
+   --------------------------------------------------------------------------
+   Ces couleurs et ces polices habillent *l'application* : la page d'accueil,
+   l'éditeur, la page publique. Elles ne touchent pas au CV lui-même, dont le
+   thème et la typographie appartiennent à celui qui le rédige — voir plus bas.
+
+   Les échelles sont dérivées des trois couleurs de la charte, en suivant la
+   rampe de luminosité de Tailwind pour rester équilibrées d'un pas à l'autre.
+   Le pas d'ancrage reproduit exactement la couleur de marque.
    ========================================================================== */
 
-@theme {
-    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+/*
+ * `static` est indispensable ici. Tailwind v4 élague les variables de `@theme`
+ * qu'aucun utilitaire n'emploie ; or Nuxt UI ne les référence que depuis son
+ * propre CSS généré (`--ui-color-primary-500: var(--color-civi-500)`), ce que
+ * l'élagage ne voit pas. Sans `static`, les variables disparaissent et tous les
+ * boutons `primary` se retrouvent sans fond.
+ */
+@theme static {
+    /* Violet — couleur principale, ancrée sur #6C3CFF au pas 500. */
+    --color-civi-50: #f3f4ff;
+    --color-civi-100: #eaeaff;
+    --color-civi-200: #d7d8ff;
+    --color-civi-300: #bab9ff;
+    --color-civi-400: #968dff;
+    --color-civi-500: #6c3cff;
+    --color-civi-600: #5e00f0;
+    --color-civi-700: #5000cf;
+    --color-civi-800: #4000aa;
+    --color-civi-900: #33008a;
+    --color-civi-950: #1b0053;
+
+    /* Bleu ciel — accent, ancré sur #4DB6FF au pas 400. */
+    --color-sky-brand-50: #f1f9ff;
+    --color-sky-brand-100: #e2f1fe;
+    --color-sky-brand-200: #c1e3fe;
+    --color-sky-brand-300: #90ceff;
+    --color-sky-brand-400: #4db6ff;
+    --color-sky-brand-500: #2aa3ef;
+    --color-sky-brand-600: #0184c9;
+    --color-sky-brand-700: #0269a1;
+    --color-sky-brand-800: #125885;
+    --color-sky-brand-900: #154a6d;
+
+    /* Jaune — ponctuation, ancré sur #FFC93C au pas 400. */
+    --color-sun-50: #fffaf0;
+    --color-sun-100: #fff1d3;
+    --color-sun-200: #ffe3a4;
+    --color-sun-300: #ffd162;
+    --color-sun-400: #ffc93c;
+    --color-sun-500: #ebb61e;
+    --color-sun-600: #c59700;
+    --color-sun-700: #9c7700;
+    --color-sun-800: #7f6000;
+    --color-sun-900: #6b5000;
+
+    /* Écru et anthracite, repris tels quels de la charte. */
+    --color-ecru: #f7f7fb;
+    --color-anthracite: #1e1f26;
+
+    /*
+     * Satoshi pour le corps, Poppins pour les titres. Les deux sont servies
+     * depuis notre domaine : Satoshi depuis resources/fonts, Poppins
+     * téléchargée au build par laravel-vite-plugin. Aucune requête vers un
+     * tiers à l'exécution.
+     */
+    --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-poppins), var(--font-satoshi), ui-sans-serif, sans-serif;
+}
+
+/* Les titres de l'application — jamais ceux du CV, qui suivent --cv-font-title. */
+h1,
+h2,
+h3,
+.font-display {
+    font-family: var(--font-display);
 }
 
 /* ==========================================================================

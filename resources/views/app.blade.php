@@ -11,7 +11,14 @@
         <meta name="robots" content="noindex, nofollow">
     @endif
 
-    <title inertia>{{ config('app.name', 'CV Studio') }}</title>
+    <title inertia>{{ config('app.name', 'Civi') }}</title>
+
+    {{-- Le favicon historique de Laravel reste servi pour les agents qui
+         demandent /favicon.ico sans lire le document. --}}
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#6c3cff">
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.ts'])

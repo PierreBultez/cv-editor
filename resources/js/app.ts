@@ -8,7 +8,7 @@ import ui from '@nuxt/ui/vue-plugin';
 import UApp from '@nuxt/ui/components/App.vue';
 import { absorbRecoveryLink } from '@/lib/storage';
 
-const appName = import.meta.env.VITE_APP_NAME || 'CV Studio';
+const appName = import.meta.env.VITE_APP_NAME || 'Civi';
 
 // Avant toute chose : un lien de modification porte son jeton dans le fragment
 // d'URL. Il faut le ranger et nettoyer l'adresse avant qu'Inertia n'installe

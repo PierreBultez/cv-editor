@@ -16,6 +16,7 @@ export interface FontOption {
 
 export const FONTS: FontOption[] = [
     { alias: 'satoshi', label: 'Satoshi', category: 'sans', hint: 'Géométrique, neutre — le choix par défaut' },
+    { alias: 'poppins', label: 'Poppins', category: 'sans', hint: 'Ronde et affirmée, la police de Civi' },
     { alias: 'inter', label: 'Inter', category: 'sans', hint: 'Très lisible en petits corps' },
     { alias: 'outfit', label: 'Outfit', category: 'sans', hint: 'Rond et contemporain' },
     { alias: 'space-grotesk', label: 'Space Grotesk', category: 'sans', hint: 'Caractère technique' },

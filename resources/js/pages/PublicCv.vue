@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/vue3';
 import type { CvRecord } from '@/lib/types';
 import A4Frame from '@/components/preview/A4Frame.vue';
 import CvPreview from '@/components/preview/CvPreview.vue';
+import CiviLogo from '@/components/CiviLogo.vue';
 
 const props = defineProps<{ cv: CvRecord }>();
 
@@ -30,8 +31,9 @@ function print(): void {
             navigateur, qui ne mène nulle part quand on arrive de l'extérieur.
         -->
         <div class="no-print mx-auto mb-6 flex max-w-[calc(210mm+2rem)] flex-wrap items-center gap-2 px-4">
-            <UButton to="/" icon="i-lucide-arrow-left" variant="ghost" color="neutral">
-                CV Studio
+            <UButton to="/" variant="ghost" color="neutral" class="gap-2">
+                <UIcon name="i-lucide-arrow-left" class="size-4" />
+                <CiviLogo height="1.5rem" />
             </UButton>
 
             <div class="ml-auto flex flex-wrap gap-2">
