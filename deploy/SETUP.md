@@ -64,8 +64,34 @@ sudo chmod -R g+rwX /var/www/cv/storage /var/www/cv/bootstrap/cache
 sudo find /var/www/cv/storage /var/www/cv/bootstrap/cache -type d -exec chmod g+s {} +
 ```
 
-Le workflow de déploiement rejoue ces trois dernières commandes à chaque
-passage, `rsync` remettant sinon ses propres permissions.
+Le workflow de déploiement rejoue ces commandes à chaque passage — sur les
+seuls fichiers qu'il a déposés, `chgrp` et `chmod` exigeant d'être propriétaire.
+
+### L'umask de PHP-FPM
+
+Il reste un piège. PHP-FPM crée ses fichiers avec l'umask `022` par défaut :
+dossiers en `755`, fichiers en `644`. Le groupe peut lire, pas écrire. Le bit
+`setgid` donne le bon groupe, pas le droit d'écriture.
+
+Conséquence : tout ce que l'application écrit — les photos, les caches —
+devient intouchable pour l'utilisateur de déploiement, et `db:seed` ou
+`artisan optimize` échouent sur un « Unable to create a directory ».
+
+Dans `/etc/php/8.4/fpm/pool.d/www.conf` :
+
+```ini
+process.umask = 0002
+```
+
+```bash
+sudo systemctl restart php8.4-fpm
+```
+
+Puis, une fois, pour reprendre les fichiers déjà créés avec l'ancien umask :
+
+```bash
+sudo chmod -R g+rwX /var/www/cv/storage /var/www/cv/bootstrap/cache
+```
 
 `storage/` est exclu du `rsync` — il porte les photos et les journaux, qui
 appartiennent au serveur, pas au dépôt. Son squelette est donc créé par le
