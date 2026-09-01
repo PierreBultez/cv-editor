@@ -46,14 +46,26 @@ devient le secret `SSH_PRIVATE_KEY`.
 sudo mkdir -p /var/www/cv && sudo chown pierre:pierre /var/www/cv
 ```
 
-Le déploiement écrit en tant que `pierre` ; PHP-FPM lit en tant que `www-data`.
-Il faut donc que `www-data` puisse traverser le dossier et écrire dans `storage`
-et `bootstrap/cache` :
+Le déploiement écrit en tant que `pierre`, PHP-FPM en tant que `www-data`. Les
+deux doivent pouvoir écrire dans `storage` et `bootstrap/cache`.
+
+Le point sensible : `rsync` dépose les fichiers avec le **groupe primaire** de
+l'utilisateur de déploiement. Si c'est `pierre`, `www-data` n'y a pas accès et
+l'application ne peut écrire ni ses journaux ni les photos — l'erreur est alors
+un 500 muet, puisque même le journal est inaccessible.
+
+On donne donc le groupe du serveur web à ces dossiers, avec le bit **setgid**
+pour que les fichiers créés ensuite en héritent :
 
 ```bash
-sudo usermod -aG pierre www-data
-sudo chmod 750 /var/www/cv
+sudo usermod -aG www-data pierre
+sudo chgrp -R www-data /var/www/cv/storage /var/www/cv/bootstrap/cache
+sudo chmod -R g+rwX /var/www/cv/storage /var/www/cv/bootstrap/cache
+sudo find /var/www/cv/storage /var/www/cv/bootstrap/cache -type d -exec chmod g+s {} +
 ```
+
+Le workflow de déploiement rejoue ces trois dernières commandes à chaque
+passage, `rsync` remettant sinon ses propres permissions.
 
 `storage/` est exclu du `rsync` — il porte les photos et les journaux, qui
 appartiennent au serveur, pas au dépôt. Son squelette est donc créé par le

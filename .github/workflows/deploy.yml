@@ -97,8 +97,12 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          # Groupe sous lequel tourne PHP-FPM. Surchargeable par secret pour un
+          # hote qui n'utiliserait pas www-data.
+          WEB_GROUP: ${{ secrets.WEB_GROUP || 'www-data' }}
         run: |
           ssh -i ~/.ssh/id_deploy -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" bash -eu <<EOF
+            WEB_GROUP="$WEB_GROUP"
             cd "$DEPLOY_PATH"
 
             if [ ! -f .env ]; then
@@ -115,9 +119,14 @@ jobs:
             # y renvoie false tant que le dossier est absent.
             mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 
-            # PHP-FPM tourne sous www-data, membre du groupe de l'utilisateur de
-            # déploiement : l'écriture doit être ouverte au groupe.
-            chmod -R ug+rwX storage bootstrap/cache
+            # rsync depose les fichiers sous l'identite de l'utilisateur de
+            # deploiement, dont le groupe primaire n'est pas celui du serveur
+            # web : PHP-FPM ne pouvait alors ecrire ni les journaux ni les
+            # photos. On donne donc explicitement le groupe du serveur web, avec
+            # le bit setgid pour que les fichiers crees ensuite en heritent.
+            chgrp -R "\$WEB_GROUP" storage bootstrap/cache
+            chmod -R g+rwX storage bootstrap/cache
+            find storage bootstrap/cache -type d -exec chmod g+s {} +
 
             php artisan storage:link --force
             php artisan migrate --force
