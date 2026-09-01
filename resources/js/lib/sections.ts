@@ -47,11 +47,9 @@ export const SECTION_LABELS: Record<SectionType, string> = {
 /**
  * Icone des coordonnees, par type de contact.
  *
- * Ce sont des pictogrammes geometriques et non les marques des plateformes :
- * sur la feuille, ces icones font 3,5 px de haut. A cette taille un logo
- * detaille devient une tache, tandis qu'une forme simple reste lisible — a
- * l'ecran comme a l'impression. LinkedIn conserve sa marque, deja en place et
- * suffisamment simple pour tenir.
+ * Les plateformes portent leur veritable marque, comme LinkedIn le faisait
+ * deja. Les traces viennent de simple-icons (voir CvIcon.vue) : redigee de
+ * memoire, une marque donne une forme approximative que l'oeil repere aussitot.
  */
 export const CONTACT_ICONS: Record<string, string> = {
     email: 'mail',
@@ -59,13 +57,13 @@ export const CONTACT_ICONS: Record<string, string> = {
     location: 'location',
     website: 'globe',
     linkedin: 'linkedin',
-    github: 'code-branch',
-    gitlab: 'code-branch',
-    malt: 'briefcase',
-    linktree: 'link',
-    behance: 'palette',
-    dribbble: 'palette',
-    mastodon: 'megaphone',
+    github: 'github',
+    gitlab: 'gitlab',
+    malt: 'malt',
+    linktree: 'linktree',
+    behance: 'behance',
+    dribbble: 'dribbble',
+    mastodon: 'mastodon',
 };
 
 export const CONTACT_LABELS: Record<string, string> = {

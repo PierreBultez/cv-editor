@@ -24,8 +24,20 @@ function print(): void {
         deborder sur une seconde page.
     -->
     <div class="print-canvas min-h-screen bg-[#e9edf3] py-[12mm]">
-        <div class="no-print mx-auto mb-6 flex max-w-[210mm] justify-end gap-2 px-4">
-            <UButton icon="i-lucide-printer" color="neutral" @click="print"> Imprimer / PDF </UButton>
+        <!--
+            Une page publique se visite souvent depuis un lien direct : sans
+            porte de sortie, il ne reste que le bouton « précédent » du
+            navigateur, qui ne mène nulle part quand on arrive de l'extérieur.
+        -->
+        <div class="no-print mx-auto mb-6 flex max-w-[calc(210mm+2rem)] flex-wrap items-center gap-2 px-4">
+            <UButton to="/" icon="i-lucide-arrow-left" variant="ghost" color="neutral">
+                CV Studio
+            </UButton>
+
+            <div class="ml-auto flex flex-wrap gap-2">
+                <UButton to="/" icon="i-lucide-plus" variant="subtle">Créer mon CV</UButton>
+                <UButton icon="i-lucide-printer" color="neutral" @click="print">Imprimer / PDF</UButton>
+            </div>
         </div>
 
         <!--
