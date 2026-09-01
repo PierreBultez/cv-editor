@@ -10,21 +10,43 @@ import { converter, formatHex, clampChroma } from 'culori';
  * quelle que soit la teinte de depart (un jaune ne « brule » pas, un bleu ne
  * vire pas au gris).
  *
- * Le pas 600 reproduit la couleur saisie : c'est celui qu'utilisent les titres
- * et les aplats du template, donc celui que l'utilisateur croit choisir.
+ * Le pas 600 est celui qu'utilisent les titres et les aplats : c'est donc lui
+ * qui doit rendre la couleur choisie. Il la reproduit a l'identique tant que sa
+ * luminosite reste lisible sur du blanc, et se contente de la ramener dans
+ * cette plage sinon. Sur les 22 familles de Tailwind, neuf passent inchangees
+ * et aucune ne descend sous un contraste de 4,5:1.
  */
 
 const toOklch = converter('oklch');
 
-/** Luminosite absolue et facteur applique a la saturation de la couleur source. */
-const STOPS: Record<number, { lightness: number; chromaFactor: number }> = {
+/**
+ * Bornes de luminosite du pas 600.
+ *
+ * Trop clair, un titre ne se lit plus sur du blanc ; trop sombre, la couleur
+ * devient indistinguable du noir et la palette perd son identite. Entre les
+ * deux, la luminosite choisie est conservee telle quelle — c'est ce qui permet
+ * de retrouver exactement la couleur cliquee.
+ */
+const MIN_LIGHTNESS = 0.32;
+const MAX_LIGHTNESS = 0.55;
+
+/**
+ * Les paliers clairs servent de fonds et gagnent a rester stables d'une teinte
+ * a l'autre ; les paliers sombres suivent la couleur choisie, par un ecart
+ * relatif au pas 600. Cet ecart garantit aussi que l'echelle reste monotone,
+ * quelle que soit la couleur de depart.
+ */
+const LIGHT_STOPS: Record<number, { lightness: number; chromaFactor: number }> = {
     50: { lightness: 0.975, chromaFactor: 0.1 },
     100: { lightness: 0.945, chromaFactor: 0.18 },
     200: { lightness: 0.878, chromaFactor: 0.36 },
-    500: { lightness: 0.508, chromaFactor: 0.95 },
-    600: { lightness: 0.42, chromaFactor: 1 },
-    700: { lightness: 0.362, chromaFactor: 0.94 },
-    900: { lightness: 0.262, chromaFactor: 0.78 },
+};
+
+const DARK_STOPS: Record<number, { offset: number; chromaFactor: number }> = {
+    500: { offset: 0.09, chromaFactor: 0.95 },
+    600: { offset: 0, chromaFactor: 1 },
+    700: { offset: -0.06, chromaFactor: 0.94 },
+    900: { offset: -0.16, chromaFactor: 0.78 },
 };
 
 export type ColorScale = Record<number, string>;
@@ -38,18 +60,26 @@ export function buildScale(hex: string): ColorScale {
 
     const chroma = base.c ?? 0;
     const hue = base.h ?? 0;
+
+    // Luminosite de reference : celle de la couleur choisie, ramenee dans la
+    // plage lisible seulement si elle en sort.
+    const anchor = Math.min(MAX_LIGHTNESS, Math.max(MIN_LIGHTNESS, base.l ?? 0.42));
+
     const scale: ColorScale = {};
 
-    for (const [stop, { lightness, chromaFactor }] of Object.entries(STOPS)) {
-        // clampChroma ramene la couleur dans le gamut sRGB en reduisant la
-        // saturation plutot qu'en ecretant les canaux, ce qui preserve la teinte.
-        const color = clampChroma(
-            { mode: 'oklch', l: lightness, c: chroma * chromaFactor, h: hue },
-            'oklch',
-            'rgb',
-        );
+    // clampChroma ramene la couleur dans le gamut sRGB en reduisant la
+    // saturation plutot qu'en ecretant les canaux, ce qui preserve la teinte.
+    const at = (lightness: number, chromaFactor: number): string =>
+        formatHex(
+            clampChroma({ mode: 'oklch', l: lightness, c: chroma * chromaFactor, h: hue }, 'oklch', 'rgb'),
+        ) ?? '#000000';
 
-        scale[Number(stop)] = formatHex(color) ?? '#000000';
+    for (const [stop, { lightness, chromaFactor }] of Object.entries(LIGHT_STOPS)) {
+        scale[Number(stop)] = at(lightness, chromaFactor);
+    }
+
+    for (const [stop, { offset, chromaFactor }] of Object.entries(DARK_STOPS)) {
+        scale[Number(stop)] = at(Math.min(0.72, Math.max(0.12, anchor + offset)), chromaFactor);
     }
 
     return scale;

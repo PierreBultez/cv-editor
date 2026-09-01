@@ -5,8 +5,10 @@ compétences, on choisit deux couleurs et deux polices, on ajoute sa photo, et
 l'aperçu au format A4 se met à jour à chaque frappe. Impression navigateur pour
 obtenir le PDF, lien public pour partager.
 
-Le projet est né d'un CV personnel statique, conservé dans [`legacy/`](legacy/) :
-sa mise en page est devenue le template « Classique » de l'outil.
+Le projet est né d'un CV statique écrit à la main, dont la mise en page est
+devenue le template « Classique ». Le CV de démonstration servi par
+`/cv/01K0DEMXCV0000000000000000` est **entièrement fictif** : aucune donnée
+personnelle réelle ne figure dans le dépôt.
 
 ## Stack
 

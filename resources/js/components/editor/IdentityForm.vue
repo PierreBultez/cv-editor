@@ -4,9 +4,38 @@ import { CONTACT_LABELS } from '@/lib/sections';
 
 const props = defineProps<{ content: CvContent; disabled?: boolean }>();
 
-const TYPES: ContactType[] = ['email', 'phone', 'location', 'linkedin', 'website'];
+/** Doit rester aligné sur CvDefaults::CONTACT_TYPES, qui valide côté serveur. */
+const TYPES: ContactType[] = [
+    'email',
+    'phone',
+    'location',
+    'website',
+    'linkedin',
+    'github',
+    'gitlab',
+    'malt',
+    'linktree',
+    'behance',
+    'dribbble',
+    'mastodon',
+];
 
 const TYPE_OPTIONS = TYPES.map((type) => ({ label: CONTACT_LABELS[type], value: type }));
+
+const PLACEHOLDERS: Partial<Record<ContactType, string>> = {
+    email: 'prenom.nom@example.com',
+    phone: '06 12 34 56 78',
+    location: '69003 Lyon, France',
+    website: 'mon-portfolio.fr',
+    linkedin: 'linkedin.com/in/prenom-nom',
+    github: 'github.com/pseudo',
+    gitlab: 'gitlab.com/pseudo',
+    malt: 'malt.fr/profile/pseudo',
+    linktree: 'linktr.ee/pseudo',
+    behance: 'behance.net/pseudo',
+    dribbble: 'dribbble.com/pseudo',
+    mastodon: '@pseudo@mastodon.social',
+};
 
 function addContact(): void {
     props.content.contact.push({ type: 'website', value: '' });
@@ -20,22 +49,27 @@ function removeContact(index: number): void {
 <template>
     <div class="space-y-4">
         <UFormField label="Nom complet">
-            <UInput v-model="content.identity.fullName" :disabled="disabled" placeholder="Pierre Bultez" />
+            <UInput v-model="content.identity.fullName" :disabled="disabled" placeholder="Prénom Nom" />
         </UFormField>
 
         <UFormField label="Intitulé du poste">
             <UInput
                 v-model="content.identity.jobTitle"
                 :disabled="disabled"
-                placeholder="Développeur Fullstack"
+                placeholder="Chargée de communication"
             />
         </UFormField>
 
-        <UFormField label="Technologies" hint="Ligne secondaire, sous l'intitulé">
+        <!--
+            Anciennement « Technologies » : le champ ne concerne pas que les
+            métiers techniques. La clé JSON reste `techLine` pour ne pas casser
+            les CV déjà enregistrés — c'est un détail d'implémentation.
+        -->
+        <UFormField label="Sous-titre" hint="Ligne secondaire, sous l'intitulé">
             <UInput
                 v-model="content.identity.techLine"
                 :disabled="disabled"
-                placeholder="Laravel • VueJS • MySQL"
+                placeholder="Événementiel • Réseaux sociaux • Rédaction"
             />
         </UFormField>
 
@@ -56,7 +90,12 @@ function removeContact(index: number): void {
                         class="w-36 shrink-0"
                         :disabled="disabled"
                     />
-                    <UInput v-model="contact.value" class="flex-1" :disabled="disabled" />
+                    <UInput
+                        v-model="contact.value"
+                        class="min-w-0 flex-1"
+                        :placeholder="PLACEHOLDERS[contact.type]"
+                        :disabled="disabled"
+                    />
                     <UButton
                         size="xs"
                         variant="ghost"

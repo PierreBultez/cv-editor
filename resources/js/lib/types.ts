@@ -3,7 +3,20 @@
  * Toute evolution doit rester alignee sur `App\Support\CvDefaults`.
  */
 
-export type ContactType = 'email' | 'phone' | 'location' | 'linkedin' | 'website';
+/** Doit rester aligné sur `CvDefaults::CONTACT_TYPES`, qui valide côté serveur. */
+export type ContactType =
+    | 'email'
+    | 'phone'
+    | 'location'
+    | 'website'
+    | 'linkedin'
+    | 'github'
+    | 'gitlab'
+    | 'malt'
+    | 'linktree'
+    | 'behance'
+    | 'dribbble'
+    | 'mastodon';
 
 export type SectionType =
     | 'experiences'

@@ -121,8 +121,15 @@ php artisan storage:link
 php artisan optimize
 ```
 
-Ne lancez **pas** `db:seed` : le CV de démonstration porte un jeton d'édition
-écrit en clair dans le dépôt, que n'importe qui pourrait alors utiliser.
+Pour publier le CV d'exemple auquel renvoie la page d'accueil :
+
+```bash
+php artisan db:seed --force
+```
+
+Le contenu est fictif et le jeton d'édition est tiré au hasard à chaque
+passage. La commande l'affiche une seule fois : conservez-le si vous comptez
+retoucher l'exemple, sinon ignorez-le — il suffira de relancer le seeder.
 
 ## 6. nginx et TLS
 

@@ -197,8 +197,10 @@ export function blankItem(type: SectionType): SectionItem {
             return { period: '', degree: '', school: '', location: '', detail: '' };
         case 'skills':
             return { label: '', level: 70 };
+        // Aucune pastille tant qu'aucun niveau n'est choisi : en afficher
+        // d'emblee laisserait croire a une saisie deja faite.
         case 'languages':
-            return { label: '', mention: '', level: 3 };
+            return { label: '', mention: '', level: 0 };
         default:
             return '';
     }

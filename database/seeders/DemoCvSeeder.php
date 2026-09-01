@@ -9,12 +9,17 @@ use App\Services\PhotoProcessor;
 use App\Support\CvDefaults;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 /**
- * CV de demonstration, repris du CV statique d'origine (`legacy/index.html`).
+ * CV de demonstration, entierement fictif.
  *
- * Il sert de reference visuelle pour verifier que le template Vue rend la meme
- * chose que la page HTML de depart, et de page publique d'exemple.
+ * Il alimente le lien « Voir un exemple » de la page d'accueil et sert de
+ * reference visuelle pour verifier le rendu des templates.
+ *
+ * Le jeton d'edition est tire au hasard a chaque passage et affiche une seule
+ * fois : un jeton ecrit en clair dans le depot aurait laisse n'importe qui
+ * modifier l'exemple en production.
  */
 class DemoCvSeeder extends Seeder
 {
@@ -33,10 +38,12 @@ class DemoCvSeeder extends Seeder
 
         Cv::where('public_id', self::PUBLIC_ID)->delete();
 
+        $plainToken = Str::random(48);
+
         $cv = new Cv;
         $cv->forceFill([
             'public_id' => self::PUBLIC_ID,
-            'edit_token' => Cv::hashToken('demo-token-non-secret'),
+            'edit_token' => Cv::hashToken($plainToken),
             'template' => 'classic',
             'theme' => CvDefaults::theme(),
             'fonts' => ['title' => 'satoshi', 'body' => 'satoshi'],
@@ -55,5 +62,7 @@ class DemoCvSeeder extends Seeder
         }
 
         $this->command?->info('CV de démonstration : /cv/'.self::PUBLIC_ID);
+        $this->command?->line('Lien de modification (affiché une seule fois, conservez-le si besoin) :');
+        $this->command?->line('  /cv/'.self::PUBLIC_ID.'/edit#t='.$plainToken);
     }
 }

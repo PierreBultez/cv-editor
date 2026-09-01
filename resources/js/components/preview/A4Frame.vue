@@ -57,8 +57,6 @@ const pageCount = computed(() => Math.max(1, Math.ceil(contentMm.value / PAGE_HE
 /** Millimetres occupes sur la derniere page. */
 const lastPageMm = computed(() => Math.round(contentMm.value - (pageCount.value - 1) * PAGE_HEIGHT_MM));
 
-const freeMm = computed(() => Math.max(0, PAGE_HEIGHT_MM - lastPageMm.value));
-
 /**
  * Un debordement de quelques millimetres est le pire cas : une page
  * supplementaire presque vide, que l'auteur n'a aucune raison de vouloir.
@@ -68,8 +66,11 @@ const severity = computed<'ok' | 'warning'>(() =>
 );
 
 const verdict = computed(() => {
+    // La feuille porte un `min-height` de 297 mm : un CV court la remplit donc
+    // en apparence, et l'espace restant n'est pas mesurable a partir de sa
+    // hauteur. Mieux vaut ne rien affirmer que d'annoncer « 0 mm libres ».
     if (pageCount.value === 1) {
-        return `Tient sur 1 page — ${freeMm.value} mm encore libres`;
+        return 'Tient sur une page';
     }
 
     if (severity.value === 'warning') {

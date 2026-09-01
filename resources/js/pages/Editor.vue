@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import type { CvRecord } from '@/lib/types';
 import { useCvStore } from '@/stores/useCvStore';
@@ -56,6 +56,36 @@ const TEMPLATE_OPTIONS = [
         description: "Bandeau d'identité pleine largeur, puis deux colonnes.",
     },
 ];
+
+/**
+ * Les onglets restent accessibles quel que soit le defilement : sans cela,
+ * arrive en bas d'une longue liste d'experiences, on ne pouvait plus atteindre
+ * « Apparence » ni « Reglages » sans remonter toute la page.
+ *
+ * La hauteur de la barre d'outils est mesuree plutot que figee : elle s'enroule
+ * sur les ecrans etroits, et un decalage constant collerait les onglets sous
+ * une barre plus haute qu'eux.
+ */
+const toolbar = ref<HTMLElement | null>(null);
+const toolbarHeight = ref(0);
+
+let toolbarObserver: ResizeObserver | null = null;
+
+onMounted(() => {
+    toolbarObserver = new ResizeObserver(() => {
+        toolbarHeight.value = toolbar.value?.offsetHeight ?? 0;
+    });
+
+    if (toolbar.value) {
+        toolbarObserver.observe(toolbar.value);
+        toolbarHeight.value = toolbar.value.offsetHeight;
+    }
+});
+
+onBeforeUnmount(() => {
+    toolbarObserver?.disconnect();
+    toolbarObserver = null;
+});
 
 function printCv(): void {
     window.print();
@@ -121,7 +151,10 @@ function destroy(): void {
 
     <div v-if="store.doc" class="print-canvas min-h-screen">
         <!-- ================= Barre d'outils ================= -->
-        <header class="no-print sticky top-0 z-20 border-b border-default bg-default/95 backdrop-blur">
+        <header
+            ref="toolbar"
+            class="no-print sticky top-0 z-20 border-b border-default bg-default/95 backdrop-blur"
+        >
             <div class="flex flex-wrap items-center gap-2 px-4 py-3">
                 <UButton to="/" variant="ghost" color="neutral" icon="i-lucide-arrow-left" size="sm">
                     Accueil
@@ -194,14 +227,19 @@ function destroy(): void {
         <div class="print-canvas grid gap-6 p-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
             <!-- Formulaire -->
             <div class="no-print" :class="{ 'hidden lg:block': mobileTab === 'apercu' }">
-                <UTabs
-                    v-model="tab"
-                    :items="[
-                        { label: 'Contenu', value: 'contenu', icon: 'i-lucide-list' },
-                        { label: 'Apparence', value: 'apparence', icon: 'i-lucide-palette' },
-                        { label: 'Réglages', value: 'reglages', icon: 'i-lucide-settings' },
-                    ]"
-                />
+                <div
+                    class="sticky z-10 -mx-1 bg-default/95 px-1 py-2 backdrop-blur"
+                    :style="{ top: `${toolbarHeight}px` }"
+                >
+                    <UTabs
+                        v-model="tab"
+                        :items="[
+                            { label: 'Contenu', value: 'contenu', icon: 'i-lucide-list' },
+                            { label: 'Apparence', value: 'apparence', icon: 'i-lucide-palette' },
+                            { label: 'Réglages', value: 'reglages', icon: 'i-lucide-settings' },
+                        ]"
+                    />
+                </div>
 
                 <div class="mt-4">
                     <div v-if="tab === 'contenu'" class="space-y-6">

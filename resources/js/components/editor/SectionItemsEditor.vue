@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CvSection, DiplomaItem, ExperienceItem, LanguageItem, SkillItem } from '@/lib/types';
 import { blankItem } from '@/stores/useCvStore';
+import { dotsForLevel, levelOptions } from '@/lib/languages';
 
 const props = defineProps<{ section: CvSection; disabled?: boolean }>();
 
@@ -53,6 +54,15 @@ function asLanguage(item: unknown): LanguageItem {
  * On normalise ici plutot que de faire confiance a la forme rendue par la
  * bibliotheque, et l'arrondi protege au passage d'une valeur flottante.
  */
+/**
+ * Un niveau CECR porte deja l'information de maitrise : les pastilles en
+ * decoulent, plutot que d'etre reglees a part.
+ */
+function applyLanguageLevel(item: LanguageItem, mention: string): void {
+    item.mention = mention;
+    item.level = dotsForLevel(mention) || item.level;
+}
+
 function toLevel(value: unknown): number {
     const raw = Array.isArray(value) ? value[0] : value;
     const parsed = Math.round(Number(raw));
@@ -201,25 +211,36 @@ const ADD_LABELS: Record<string, string> = {
                 </div>
             </div>
 
-            <!-- Langues -->
+            <!--
+                Langues : le niveau CECR pilote a la fois la mention affichée et
+                le nombre de pastilles. Deux réglages distincts pour la même
+                information finissaient par se contredire.
+            -->
             <div v-else-if="section.type === 'languages'" class="space-y-2">
-                <div class="grid grid-cols-2 gap-2">
+                <UFormField label="Langue" size="sm">
                     <UInput v-model="asLanguage(item).label" :disabled="disabled" placeholder="Anglais" />
-                    <UInput v-model="asLanguage(item).mention" :disabled="disabled" placeholder="B1 — Intermédiaire" />
-                </div>
-                <div class="flex items-center gap-3">
-                    <USlider
-                        :model-value="asLanguage(item).level"
-                        :min="0"
-                        :max="5"
-                        :step="1"
-                        :disabled="disabled"
-                        @update:model-value="asLanguage(item).level = toLevel($event)"
-                    />
-                    <span class="w-10 shrink-0 text-right text-xs tabular-nums text-muted">
-                        {{ asLanguage(item).level }}/5
-                    </span>
-                </div>
+                </UFormField>
+
+                <UFormField label="Niveau" size="sm" hint="Échelle du CECR">
+                    <div class="flex items-center gap-3">
+                        <USelect
+                            :model-value="asLanguage(item).mention"
+                            :items="levelOptions(asLanguage(item).mention)"
+                            placeholder="Choisir un niveau"
+                            class="min-w-0 flex-1"
+                            :disabled="disabled"
+                            @update:model-value="applyLanguageLevel(asLanguage(item), String($event))"
+                        />
+                        <span class="flex shrink-0 gap-1">
+                            <i
+                                v-for="dot in 5"
+                                :key="dot"
+                                class="size-2 rounded-full"
+                                :class="dot <= asLanguage(item).level ? 'bg-primary' : 'bg-accented'"
+                            />
+                        </span>
+                    </div>
+                </UFormField>
             </div>
 
             <!-- Outils et centres d'intérêt -->

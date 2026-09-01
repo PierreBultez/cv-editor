@@ -1,18 +1,20 @@
 {
   "schema_version": 1,
   "identity": {
-    "fullName": "Pierre Bultez",
-    "jobTitle": "Développeur Fullstack Intermédiaire",
-    "techLine": "Laravel • VueJS • MySQL • TailwindCSS • Livewire • Redis • Git • CI/CD",
-    "tagline": "Fort d'un parcours qui mêle terrain, technique, encadrement et gestion, je cherche un poste où mon adaptabilité, mon sérieux et mon sens pratique seront des atouts au quotidien."
+    "fullName": "Camille Moreau",
+    "jobTitle": "Chargée de communication digitale",
+    "techLine": "Réseaux sociaux • Rédaction • Événementiel",
+    "tagline": "Personnage fictif — ce CV sert d'exemple. Toute ressemblance avec une personne réelle serait fortuite."
   },
-  "profile": "Autonome, curieux et orienté solutions, j'ai développé au fil de mes expériences une solide capacité d'apprentissage et de résolution de problèmes. À l'aise aussi bien dans les environnements techniques que dans les missions opérationnelles, j'apprécie le travail concret, l'esprit d'équipe et l'amélioration continue, avec le souci constant du service, de l'efficacité et du travail bien fait.",
+  "profile": "Après six ans passés entre agence et association, j'aime autant construire une ligne éditoriale que la défendre au quotidien. J'ai appris à écrire court, à mesurer ce qui fonctionne, et à travailler avec des équipes qui n'ont ni le temps ni le goût du jargon.",
   "contact": [
-    { "type": "email",    "value": "pierre.bultez@proton.me" },
-    { "type": "phone",    "value": "06 68 69 62 22" },
-    { "type": "location", "value": "84350 Courthézon, France" },
-    { "type": "linkedin", "value": "linkedin.com/in/pierre-bultez-5699b52a8/" },
-    { "type": "website",  "value": "pierrebultez.com" }
+    { "type": "email",    "value": "camille.moreau@example.com" },
+    { "type": "phone",    "value": "06 12 34 56 78" },
+    { "type": "location", "value": "69003 Lyon, France" },
+    { "type": "website",  "value": "camille-moreau.example" },
+    { "type": "linkedin", "value": "linkedin.com/in/camille-moreau" },
+    { "type": "behance",  "value": "behance.net/camillemoreau" },
+    { "type": "linktree", "value": "linktr.ee/camillemoreau" }
   ],
   "sections": [
     {
@@ -22,15 +24,12 @@
       "column": "sidebar",
       "enabled": true,
       "items": [
-        { "label": "Backend : PHP, Laravel, API REST, MySQL", "level": 85 },
-        { "label": "Frontend : JavaScript, VueJS, Alpine.js, Livewire, TailwindCSS", "level": 80 },
-        { "label": "DevOps : Linux Ubuntu, Git/GitHub, GitHub Actions, Apache, Nginx, Composer, Certbot", "level": 75 },
-        { "label": "Services : Redis, RabbitMQ, Elasticsearch", "level": 65 },
-        { "label": "En apprentissage / montée en compétence : React, TypeScript, Docker", "level": 40 },
-        { "label": "Polyvalence & autonomie", "level": 95 },
-        { "label": "Capacité d'apprentissage", "level": 95 },
-        { "label": "Gestion de projet", "level": 80 },
-        { "label": "Amélioration continue", "level": 85 }
+        { "label": "Rédaction et ligne éditoriale", "level": 90 },
+        { "label": "Réseaux sociaux : stratégie, calendrier, animation", "level": 85 },
+        { "label": "Organisation d'événements et relations partenaires", "level": 80 },
+        { "label": "Analyse d'audience et reporting", "level": 70 },
+        { "label": "Photographie et retouche", "level": 60 },
+        { "label": "Travail en équipe restreinte", "level": 90 }
       ]
     },
     {
@@ -41,7 +40,8 @@
       "enabled": true,
       "items": [
         { "label": "Français", "mention": "Langue maternelle", "level": 5 },
-        { "label": "Anglais", "mention": "B1 — Intermédiaire", "level": 3 }
+        { "label": "Anglais", "mention": "C1 — Autonome", "level": 5 },
+        { "label": "Espagnol", "mention": "B1 — Niveau seuil", "level": 3 }
       ]
     },
     {
@@ -51,13 +51,13 @@
       "column": "sidebar",
       "enabled": true,
       "items": [
-        "Suite bureautique Apple (Numbers, Pages, Keynotes)",
+        "Suite Adobe (Photoshop, InDesign)",
+        "Canva",
         "Google Workspace",
-        "Linux basés sur Debian",
-        "Slack | Notion | Trello",
-        "Git | GitHub | GitHub Actions",
-        "Suite Jetbrains (PhpStorm, WebStorm)",
-        "Figma | Illustrator"
+        "Notion | Trello",
+        "Meta Business Suite",
+        "Matomo",
+        "Brevo"
       ]
     },
     {
@@ -67,10 +67,10 @@
       "column": "sidebar",
       "enabled": true,
       "items": [
-        "Marche",
-        "Vélo",
-        "Terrariophilie",
-        "Lecture & veille technologique"
+        "Randonnée",
+        "Photographie argentique",
+        "Bénévolat en médiathèque",
+        "Podcasts documentaires"
       ]
     },
     {
@@ -81,111 +81,45 @@
       "enabled": true,
       "items": [
         {
-          "period": "2026",
-          "role": "Employé polyvalent",
-          "company": "Carrefour Express",
-          "location": "Courthézon (84)",
-          "bullets": [
-            "Déchargement de camions.",
-            "Mise en rayon frais, fruits et légumes, liquides.",
-            "Tenue de caisse."
-          ]
-        },
-        {
-          "period": "2025 — aujourd'hui",
-          "role": "Développeur fullstack freelance",
-          "company": "EI Pierre Bultez",
-          "location": "Courthézon (84)",
-          "bullets": [
-            "Développement de solutions e-commerce sur-mesure.",
-            "Spécialiste Laravel, VueJS, Wordpress.",
-            "Développement de solutions métiers sur-mesure."
-          ]
-        },
-        {
-          "period": "2023 — 2025",
-          "role": "Congé parental & formation en développement informatique",
-          "company": "OpenClassrooms",
-          "location": "Remote",
-          "bullets": [
-            "Période consacrée à la parentalité à la suite de la naissance de mes jumelles (3éme et 4éme enfants), associé à une reconversion professionnelle.",
-            "Formation intensive en développement informatique et réalisation de projets professionnels.",
-            "Obtention d'un titre professionnel de développeur informatique de niveau 5."
-          ]
-        },
-        {
-          "period": "2022 — 2023",
-          "role": "Gérant & cuisinier",
-          "company": "Wendy's Diner",
-          "location": "Courthézon (84)",
-          "bullets": [
-            "Gestion opérationnelle d'un établissement de restauration rapide spécialisé dans les burgers artisanaux : production, service, approvisionnements et stocks.",
-            "Mise en œuvre et suivi des règles d'hygiène alimentaire selon les principes HACCP.",
-            "Conception et développement des outils numériques de prise de commandes, gestion de la carte et système de caisse."
-          ]
-        },
-        {
-          "period": "2020 — 2022",
-          "role": "Responsable technique full remote",
-          "company": "Utopya.fr",
+          "period": "2023 — aujourd'hui",
+          "role": "Chargée de communication",
+          "company": "Association Le Fil Vert",
           "location": "Lyon (69)",
           "bullets": [
-            "Sourcing Chine de pièces détachées smartphones, tablettes et informatique.",
-            "Gestion et mise en place de projets spécifiques (nouveaux services).",
-            "Accompagnement technique de clients stratégiques."
+            "Refonte de la ligne éditoriale et du calendrier de publication.",
+            "Animation de trois réseaux sociaux, audience doublée en dix-huit mois.",
+            "Organisation de deux événements annuels réunissant 400 participants."
+          ]
+        },
+        {
+          "period": "2021 — 2023",
+          "role": "Chargée de projet junior",
+          "company": "Agence Bonjour",
+          "location": "Villeurbanne (69)",
+          "bullets": [
+            "Suivi de six comptes clients, du brief à la livraison.",
+            "Rédaction de newsletters et de contenus de marque.",
+            "Coordination avec les graphistes et les prestataires vidéo."
+          ]
+        },
+        {
+          "period": "2020 — 2021",
+          "role": "Assistante communication — alternance",
+          "company": "Maison de quartier des Sources",
+          "location": "Lyon (69)",
+          "bullets": [
+            "Conception des supports imprimés pour la saison culturelle.",
+            "Mise à jour du site et de l'agenda en ligne."
           ]
         },
         {
           "period": "2018 — 2020",
-          "role": "Technicien réparation smartphones",
-          "company": "E. Leclerc",
-          "location": "Carpentras (84)",
+          "role": "Serveuse puis responsable de salle",
+          "company": "Café des Halles",
+          "location": "Lyon (69)",
           "bullets": [
-            "Encadrement et formation de l'équipe de réparation.",
-            "Responsable achats smartphones neufs, accessoires et pièces détachées.",
-            "Suivi des marges et amélioration du chiffre d'affaire."
-          ]
-        },
-        {
-          "period": "2013 — 2018",
-          "role": "Technicien en réparation smartphones",
-          "company": "Entrepreneur individuel",
-          "location": "Boulogne-sur-mer (62)",
-          "bullets": [
-            "Diagnostic de pannes et réalisation de réparations matérielles et logicielles sur smartphones.",
-            "Veille technique et autoformation continue sur les nouveaux modèles, technologies et outils de diagnostic.",
-            "Conception de mes premiers sites web vitrines pour développer et promouvoir mon activité."
-          ]
-        },
-        {
-          "period": "2011",
-          "role": "Pontier cabine",
-          "company": "LME",
-          "location": "Valenciennes (59)",
-          "bullets": [
-            "Travail posté 2x matins, 2x après-midi, 2x nuits, 4x repos.",
-            "Travail en environnement hostile (acierie)."
-          ]
-        },
-        {
-          "period": "2010 — 2011",
-          "role": "Agent logistique",
-          "company": "Auchan",
-          "location": "Valenciennes (59)",
-          "bullets": [
-            "Conduite de chariot élévateur frontal et transpalette électrique.",
-            "Respect des règles de sécurité et bonnes pratiques de manutention."
-          ]
-        },
-        {
-          "period": "2002 — 2010",
-          "role": "Divers missions interim",
-          "company": "Adecco",
-          "location": "Valenciennes (59)",
-          "bullets": [
-            "Mécanicien ferroviaire et automobile.",
-            "Agent de production automobile (Toyota Valenciennes).",
-            "Magasinier cariste (Bombardier Valenciennes)."
+            "Encadrement d'une équipe de quatre personnes le week-end.",
+            "Financement des études en parallèle de la licence."
           ]
         }
       ]
@@ -198,17 +132,17 @@
       "enabled": true,
       "items": [
         {
-          "period": "2025",
-          "degree": "Titre rncp niveau 5 (bac +2) Développeur Informatique",
-          "school": "OpenClassrooms",
-          "location": "Remote",
-          "detail": "Spécialité : Développement Wordpress"
+          "period": "2021",
+          "degree": "Master 1 Information et communication",
+          "school": "Université Lumière",
+          "location": "Lyon (69)",
+          "detail": "Parcours communication des organisations"
         },
         {
-          "period": "2002",
-          "degree": "Bac STI",
-          "school": "Lycée du Hainaut",
-          "location": "Valenciennes (59)",
+          "period": "2019",
+          "degree": "Licence Lettres modernes",
+          "school": "Université Lumière",
+          "location": "Lyon (69)",
           "detail": ""
         }
       ]
@@ -221,10 +155,10 @@
       "enabled": true,
       "items": [
         {
-          "period": "2022",
-          "degree": "Référent Hygiène en Restauration Commerciale",
-          "school": "Mérieux Nutrisciences",
-          "location": "Paris (75)",
+          "period": "2024",
+          "degree": "Certification Voltaire — 850 points",
+          "school": "Projet Voltaire",
+          "location": "À distance",
           "detail": ""
         }
       ]

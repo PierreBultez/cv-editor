@@ -44,19 +44,41 @@ export const SECTION_LABELS: Record<SectionType, string> = {
     interests: "Centres d'intérêt",
 };
 
-/** Icone des coordonnees, par type de contact. */
+/**
+ * Icone des coordonnees, par type de contact.
+ *
+ * Ce sont des pictogrammes geometriques et non les marques des plateformes :
+ * sur la feuille, ces icones font 3,5 px de haut. A cette taille un logo
+ * detaille devient une tache, tandis qu'une forme simple reste lisible — a
+ * l'ecran comme a l'impression. LinkedIn conserve sa marque, deja en place et
+ * suffisamment simple pour tenir.
+ */
 export const CONTACT_ICONS: Record<string, string> = {
     email: 'mail',
     phone: 'phone',
     location: 'location',
-    linkedin: 'linkedin',
     website: 'globe',
+    linkedin: 'linkedin',
+    github: 'code-branch',
+    gitlab: 'code-branch',
+    malt: 'briefcase',
+    linktree: 'link',
+    behance: 'palette',
+    dribbble: 'palette',
+    mastodon: 'megaphone',
 };
 
 export const CONTACT_LABELS: Record<string, string> = {
     email: 'E-mail',
     phone: 'Téléphone',
     location: 'Localisation',
-    linkedin: 'LinkedIn',
     website: 'Site web',
+    linkedin: 'LinkedIn',
+    github: 'GitHub',
+    gitlab: 'GitLab',
+    malt: 'Malt',
+    linktree: 'Linktree',
+    behance: 'Behance',
+    dribbble: 'Dribbble',
+    mastodon: 'Mastodon',
 };

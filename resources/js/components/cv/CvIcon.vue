@@ -32,6 +32,20 @@ const PATHS: Record<string, string> = {
     award: '<circle cx="12" cy="9" r="5"/><path d="m9 13-2 8 5-3 5 3-2-8"/>',
     linkedin:
         '<path d="M6.2 8.2H2.7V21h3.5V8.2ZM4.45 2A2.05 2.05 0 1 0 4.5 6.1 2.05 2.05 0 0 0 4.45 2ZM21 13.7c0-3.85-2.05-5.64-4.8-5.64-2.2 0-3.2 1.22-3.76 2.08V8.2H8.95V21h3.49v-6.34c0-1.67.32-3.3 2.4-3.3 2.04 0 2.07 1.9 2.07 3.4V21H21v-7.3Z"/>',
+
+    // Depots de code : GitHub, GitLab.
+    'code-branch':
+        '<circle cx="7" cy="5" r="2.5"/><circle cx="7" cy="19" r="2.5"/><circle cx="17" cy="9" r="2.5"/><path d="M7 7.5v9M17 11.5c0 3-2.5 4-5 4.5"/>',
+
+    // Agregateurs de liens : Linktree.
+    link: '<path d="M10 13.5a4 4 0 0 0 5.7.3l3-3a4 4 0 0 0-5.7-5.7l-1.7 1.7"/><path d="M14 10.5a4 4 0 0 0-5.7-.3l-3 3a4 4 0 0 0 5.7 5.7l1.7-1.7"/>',
+
+    // Portfolios visuels : Behance, Dribbble.
+    palette:
+        '<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.8 1.8-1.8H16a5 5 0 0 0 5-5c0-4-4-7-9-7Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="11" cy="7.5" r="1.2"/><circle cx="15.5" cy="8.5" r="1.2"/>',
+
+    // Reseaux sociaux : Mastodon.
+    megaphone: '<path d="M4 10v4a1 1 0 0 0 1 1h3l6 4V5L8 9H5a1 1 0 0 0-1 1Z"/><path d="M17.5 8.5a5 5 0 0 1 0 7"/>',
 };
 
 const markup = computed(() => PATHS[props.name] ?? PATHS.user);

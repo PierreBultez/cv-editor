@@ -31,8 +31,27 @@ final class CvDefaults
         'lora',
     ];
 
-    /** Types de coordonnees, chacun associe a une icone dans le template. */
-    public const CONTACT_TYPES = ['email', 'phone', 'location', 'linkedin', 'website'];
+    /**
+     * Types de coordonnees, chacun associe a une icone dans le template.
+     *
+     * Ajouter un type impose de completer CONTACT_ICONS et CONTACT_LABELS dans
+     * resources/js/lib/sections.ts, faute de quoi il s'affichera avec l'icone
+     * par defaut et sans libelle dans l'editeur.
+     */
+    public const CONTACT_TYPES = [
+        'email',
+        'phone',
+        'location',
+        'website',
+        'linkedin',
+        'github',
+        'gitlab',
+        'malt',
+        'linktree',
+        'behance',
+        'dribbble',
+        'mastodon',
+    ];
 
     /** Types de sections et forme de leurs items. */
     public const SECTION_TYPES = [
@@ -54,7 +73,7 @@ final class CvDefaults
 
     public const MAX_BULLETS_PER_ITEM = 10;
 
-    public const MAX_CONTACTS = 8;
+    public const MAX_CONTACTS = 10;
 
     public static function theme(): array
     {
