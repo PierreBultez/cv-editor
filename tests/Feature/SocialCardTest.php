@@ -54,6 +54,27 @@ it('expose le nom quand l auteur a autorisé l indexation', function () {
         ->assertSee('Camille Moreau — Chargée de communication', escape: false);
 });
 
+/**
+ * Le debogueur de partage Facebook signale fb:app_id comme « propriete
+ * requise ». Il ne l'est pas : l'apercu s'affiche sans lui, la balise ne servant
+ * qu'a rattacher le domaine a une application Meta pour ses statistiques. On
+ * l'emet donc seulement si un identifiant est configure, plutot que d'inventer
+ * une valeur qui ne correspondrait a aucune application.
+ */
+it('omet fb:app_id tant qu aucune application Meta n est configurée', function () {
+    config(['cv.facebook_app_id' => null]);
+
+    $this->get('/')->assertOk()->assertDontSee('fb:app_id', escape: false);
+});
+
+it('émet fb:app_id une fois l application Meta configurée', function () {
+    config(['cv.facebook_app_id' => '1234567890']);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('fb:app_id" content="1234567890', escape: false);
+});
+
 it('sert une image de partage aux bonnes dimensions', function () {
     $this->get('/')
         ->assertSee('og:image:width" content="1200', escape: false)

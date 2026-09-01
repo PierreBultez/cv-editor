@@ -43,6 +43,10 @@
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Civi — le générateur de CV">
 
+    @if ($appId = config('cv.facebook_app_id'))
+        <meta property="fb:app_id" content="{{ $appId }}">
+    @endif
+
     {{-- `summary_large_image` affiche la vignette en pleine largeur ;
          `summary` la réduirait à une petite miniature carrée. --}}
     <meta name="twitter:card" content="summary_large_image">
