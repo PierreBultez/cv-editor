@@ -17,6 +17,22 @@ final class SocialCard
 {
     public const IMAGE = '/og-image.png';
 
+    /**
+     * URL de l'image, suffixee de la date du fichier.
+     *
+     * Facebook, LinkedIn et X conservent longtemps la vignette associee a une
+     * URL. Remplacer le fichier sans changer son adresse laisserait donc
+     * l'ancienne image circuler pendant des semaines ; l'empreinte fait de
+     * chaque version une adresse distincte.
+     */
+    public static function imageUrl(): string
+    {
+        $path = public_path(ltrim(self::IMAGE, '/'));
+        $version = is_file($path) ? filemtime($path) : null;
+
+        return url(self::IMAGE).($version ? "?v={$version}" : '');
+    }
+
     /** @return array<string, string|bool> */
     public static function landing(): array
     {

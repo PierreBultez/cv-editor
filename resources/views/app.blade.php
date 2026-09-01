@@ -27,7 +27,7 @@
     @php
         $ogTitle ??= config('app.name', 'Civi');
         $ogDescription ??= 'Faites votre CV, pas votre mise en page. Gratuit, sans compte.';
-        $ogImage = url(\App\Support\SocialCard::IMAGE);
+        $ogImage = \App\Support\SocialCard::imageUrl();
     @endphp
 
     <meta name="description" content="{{ $ogDescription }}">
