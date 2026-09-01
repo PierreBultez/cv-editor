@@ -15,7 +15,12 @@ use App\Models\Cv;
  */
 final class SocialCard
 {
-    public const IMAGE = '/og-image.png';
+    /**
+     * JPEG et non PNG : le visuel comporte de grands aplats que la
+     * quantification de GD dithere en un bruit visible, a poids egal.
+     * Voir deploy/og-image.php, qui le fabrique.
+     */
+    public const IMAGE = '/og-image.jpg';
 
     /**
      * URL de l'image, suffixee de la date du fichier.

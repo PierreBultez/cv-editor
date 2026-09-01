@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Cv;
+use App\Support\SocialCard;
 
 /**
  * Ce que Facebook, LinkedIn ou X affichent quand on colle un lien.
@@ -58,8 +59,14 @@ it('sert une image de partage aux bonnes dimensions', function () {
         ->assertSee('og:image:width" content="1200', escape: false)
         ->assertSee('og:image:height" content="630', escape: false);
 
-    expect(public_path('og-image.png'))->toBeReadableFile();
+    $path = public_path(ltrim(SocialCard::IMAGE, '/'));
 
-    [$width, $height] = getimagesize(public_path('og-image.png'));
+    expect($path)->toBeReadableFile();
+
+    // Les plateformes rognent une image d'un autre ratio, chacune a sa maniere.
+    [$width, $height, $type] = getimagesize($path);
     expect([$width, $height])->toBe([1200, 630]);
+
+    // JPEG ou PNG : les robots sociaux ne lisent pas WebP de facon fiable.
+    expect($type)->toBeIn([IMAGETYPE_JPEG, IMAGETYPE_PNG]);
 });

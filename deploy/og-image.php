@@ -3,22 +3,30 @@
 declare(strict_types=1);
 
 /**
- * Fabrique l'image de partage a partir de assets/branding/og-source.png.
+ * Fabrique l'image de partage a partir de assets/branding/og-image.png.
  *
- *     php deploy/og-image.php
+ *     php deploy/og-image.php              produit public/og-image.jpg
+ *     php deploy/og-image.php --compare    ecrit aussi les candidats ecartes
  *
  * Pourquoi ni WebP ni AVIF : la balise og:image ne designe qu'une seule URL,
  * sans negociation de format. Or les robots de Facebook, LinkedIn et X lisent
- * JPEG et PNG de facon fiable, WebP inegalement, AVIF pas du tout. Le gain de
+ * JPEG et PNG de facon fiable, WebP inegalement, AVIF pas du tout. Un gain de
  * poids ne vaut rien si l'apercu disparait.
  *
- * Le script produit les deux candidats serieux et affiche leur poids : au PNG
- * quantifie de conserver les aplats et le texte fin, au JPEG d'etre plus leger.
- * On garde celui qui tient la promesse a l'oeil pour le moins d'octets.
+ * Pourquoi JPEG plutot que PNG quantifie, a poids egal (80 Ko) : le visuel
+ * comporte de grands aplats violets et jaunes. La quantification de GD ne sait
+ * pas representer ces teintes exactes dans une palette reduite et les dithere,
+ * ce qui constelle les aplats d'un bruit tres visible. Le JPEG les rend nets,
+ * et sur le texte fin de la maquette les deux se valent. Verifie a 3x sur une
+ * zone de texte et sur une zone d'aplat avant de trancher.
  */
-const SOURCE = 'assets/branding/og-source.png';
+const SOURCE = 'assets/branding/og-image.png';
+const OUTPUT = 'public/og-image.jpg';
 const WIDTH = 1200;
 const HEIGHT = 630;
+const QUALITY = 82;
+
+$compare = in_array('--compare', $argv, true);
 
 if (! file_exists(SOURCE)) {
     fwrite(STDERR, 'Source absente : '.SOURCE."\n");
@@ -26,7 +34,7 @@ if (! file_exists(SOURCE)) {
 }
 
 [$sw, $sh] = getimagesize(SOURCE);
-printf("Source : %dx%d, %d Ko\n\n", $sw, $sh, filesize(SOURCE) / 1024);
+printf("Source : %dx%d, %d Ko\n", $sw, $sh, filesize(SOURCE) / 1024);
 
 $source = imagecreatefrompng(SOURCE);
 
@@ -54,39 +62,23 @@ $canvas = imagecreatetruecolor(WIDTH, HEIGHT);
 imagefilledrectangle($canvas, 0, 0, WIDTH, HEIGHT, imagecolorallocate($canvas, 0xF7, 0xF7, 0xFB));
 imagecopyresampled($canvas, $source, 0, 0, $cx, $cy, WIDTH, HEIGHT, $cw, $ch);
 
-$results = [];
+imagejpeg($canvas, OUTPUT, QUALITY);
+printf("%s : %dx%d, %d Ko (qualite %d)\n", OUTPUT, WIDTH, HEIGHT, filesize(OUTPUT) / 1024, QUALITY);
 
-// JPEG : le plus leger, au prix d'artefacts sur le texte fin de la maquette.
-foreach ([82, 88] as $quality) {
-    $path = "public/og-image-q{$quality}.jpg";
-    imagejpeg($canvas, $path, $quality);
-    $results["JPEG q{$quality}"] = $path;
-}
+if ($compare) {
+    imagejpeg($canvas, 'public/og-image-q88.jpg', 88);
 
-// PNG quantifie : l'image est faite d'aplats, une palette reduite y coute peu.
-foreach ([256, 128] as $colors) {
-    $copy = imagecreatetruecolor(WIDTH, HEIGHT);
-    imagecopy($copy, $canvas, 0, 0, 0, 0, WIDTH, HEIGHT);
-    imagetruecolortopalette($copy, true, $colors);
-    $path = "public/og-image-{$colors}c.png";
-    imagepng($copy, $path, 9);
-    imagedestroy($copy);
-    $results["PNG {$colors} couleurs"] = $path;
-}
+    foreach ([256, 128] as $colors) {
+        $copy = imagecreatetruecolor(WIDTH, HEIGHT);
+        imagecopy($copy, $canvas, 0, 0, 0, 0, WIDTH, HEIGHT);
+        imagetruecolortopalette($copy, true, $colors);
+        imagepng($copy, "public/og-image-{$colors}c.png", 9);
+        imagedestroy($copy);
+    }
 
-// PNG pleine profondeur, pour mesurer ce que la quantification fait gagner.
-imagepng($canvas, 'public/og-image-full.png', 9);
-$results['PNG 24 bits'] = 'public/og-image-full.png';
-
-printf("%-22s %10s\n", 'Candidat', 'Poids');
-printf("%s\n", str_repeat('-', 34));
-
-foreach ($results as $label => $path) {
-    printf("%-22s %7d Ko\n", $label, filesize($path) / 1024);
+    imagepng($canvas, 'public/og-image-full.png', 9);
+    echo "Candidats ecrits a cote, a supprimer une fois compares.\n";
 }
 
 imagedestroy($canvas);
 imagedestroy($source);
-
-echo "\nInspectez les fichiers, gardez le meilleur compromis sous public/og-image.png\n";
-echo "ou .jpg, puis ajustez SocialCard::IMAGE si l'extension change.\n";
