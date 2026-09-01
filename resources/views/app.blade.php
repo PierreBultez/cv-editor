@@ -57,6 +57,15 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
     @inertiaHead
+
+    {{-- Open Analytics. La clé est publique par conception : c'est un
+         identifiant d'ingestion en écriture seule. --}}
+    <script
+        async
+        src="https://c.getopen.so/oa.js"
+        data-key="oa_pk_3VWvbDhP5A26F4hGMjsvyWoILlN_SMN5"
+        data-collector="https://c.getopen.so"
+    ></script>
 </head>
 <body class="h-full bg-default text-default antialiased">
 @inertia
