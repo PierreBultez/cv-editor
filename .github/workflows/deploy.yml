@@ -1,0 +1,154 @@
+name: Déploiement
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  # Permet de redéployer sans nouveau commit.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publier en production
+    runs-on: ubuntu-latest
+    environment: production
+
+    # On ne déploie jamais un commit dont la CI a échoué.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # PHP 8.4 ici comme sur le serveur : les dépendances sont installées dans
+      # la CI puis expédiées telles quelles, ce qui évite d'exiger Composer sur
+      # le serveur et garantit que le vendor/ livré correspond au composer.lock
+      # qui vient d'être testé.
+      - name: Installer PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, pdo_mysql, mysqli, fileinfo, zip, intl, mbstring, curl
+          coverage: none
+
+      - name: Dépendances PHP de production
+        run: composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # Les assets sont compilés ici : le serveur n'a donc besoin ni des
+      # dépendances de développement ni d'exécuter Vite.
+      - name: Build des assets
+        run: npm run build
+
+      - name: Préparer la connexion SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "${SSH_PORT:-22}" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      # `--delete` nettoie ce qui a disparu du dépôt, d'où les exclusions :
+      # le .env, le stockage et le lien public/storage appartiennent au serveur
+      # et ne doivent jamais être écrasés ni supprimés.
+      - name: Synchroniser les fichiers
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_deploy -p ${SSH_PORT:-22}" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='legacy' \
+            --exclude='.env' \
+            --exclude='storage' \
+            --exclude='public/storage' \
+            --exclude='database/*.sqlite*' \
+            ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH/"
+
+      # Le .env appartient au serveur et n'est jamais transmis. Au tout premier
+      # deploiement il n'existe pas encore : les commandes artisan echoueraient
+      # sur une application sans configuration ni clef. On saute alors l'etape
+      # en l'expliquant, plutot que de faire echouer le workflow.
+      - name: Migrer et réamorcer les caches
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          # Groupe sous lequel tourne PHP-FPM. Surchargeable par secret pour un
+          # hote qui n'utiliserait pas www-data.
+          WEB_GROUP: ${{ secrets.WEB_GROUP || 'www-data' }}
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" bash -eu <<EOF
+            WEB_GROUP="$WEB_GROUP"
+            cd "$DEPLOY_PATH"
+
+            if [ ! -f .env ]; then
+              echo "::warning::Aucun .env sur le serveur — étapes artisan ignorées."
+              echo "Premier déploiement : suivez deploy/SETUP.md, étape 5."
+              exit 0
+            fi
+
+            # storage/ est exclu du rsync — il porte les photos et les journaux,
+            # qui appartiennent au serveur. Son squelette n'existe donc pas sur
+            # un hôte neuf, et « artisan optimize » échoue sur un
+            # « View path not found » qui désigne en réalité
+            # config('view.compiled'), soit storage/framework/views : realpath()
+            # y renvoie false tant que le dossier est absent.
+            mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+
+            # rsync depose les fichiers sous l'identite de l'utilisateur de
+            # deploiement, dont le groupe primaire n'est pas celui du serveur
+            # web : PHP-FPM ne pouvait alors ecrire ni les journaux ni les
+            # photos. On donne donc explicitement le groupe du serveur web, avec
+            # le bit setgid pour que les fichiers crees ensuite en heritent.
+            chgrp -R "\$WEB_GROUP" storage bootstrap/cache
+            chmod -R g+rwX storage bootstrap/cache
+            find storage bootstrap/cache -type d -exec chmod g+s {} +
+
+            php artisan storage:link --force
+            php artisan migrate --force
+            php artisan optimize
+          EOF
+
+      # OPcache sert le code en mémoire : sans rechargement, une configuration
+      # avec validate_timestamps=0 continuerait d'exécuter l'ancienne version.
+      # Renseigner le secret FPM_RELOAD_COMMAND (ex. « sudo systemctl reload
+      # php8.4-fpm ») pour activer cette étape.
+      #
+      # Le test est fait dans le script et non dans un `if:` : le contexte
+      # `secrets` n'y est pas évalué de façon fiable.
+      - name: Recharger PHP-FPM
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          FPM_RELOAD_COMMAND: ${{ secrets.FPM_RELOAD_COMMAND }}
+        run: |
+          if [ -z "${FPM_RELOAD_COMMAND:-}" ]; then
+            echo "FPM_RELOAD_COMMAND non défini : étape ignorée."
+            exit 0
+          fi
+          ssh -i ~/.ssh/id_deploy -p "${SSH_PORT:-22}" "$SSH_USER@$SSH_HOST" "$FPM_RELOAD_COMMAND"

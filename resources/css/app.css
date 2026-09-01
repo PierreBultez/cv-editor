@@ -1,0 +1,296 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* ==========================================================================
+   Interface de l'outil (hors aperçu CV)
+   ========================================================================== */
+
+@theme {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   Aperçu du CV
+   --------------------------------------------------------------------------
+   Le template ne code aucune couleur ni police en dur : tout passe par les
+   variables ci-dessous, réécrites en style inline sur la racine de l'aperçu
+   par `CvPreview.vue`. Changer un thème ne déclenche donc aucun rebuild CSS.
+
+   L'échelle `--cv-primary-*` est produite par `resources/js/lib/palette.ts`
+   à partir d'une seule couleur choisie par l'utilisateur.
+   ========================================================================== */
+
+@theme {
+    --color-cv-50: var(--cv-primary-50, #f4f7fb);
+    --color-cv-100: var(--cv-primary-100, #e9f0f8);
+    --color-cv-200: var(--cv-primary-200, #cedcec);
+    --color-cv-500: var(--cv-primary-500, #245ea9);
+    --color-cv-600: var(--cv-primary-600, #174d94);
+    --color-cv-700: var(--cv-primary-700, #103f7c);
+    --color-cv-900: var(--cv-primary-900, #0a2854);
+}
+
+:root {
+    /* Valeurs par défaut : la palette bleue du CV d'origine. */
+    --cv-primary-50: #f4f7fb;
+    --cv-primary-100: #e9f0f8;
+    --cv-primary-200: #cedcec;
+    --cv-primary-500: #245ea9;
+    --cv-primary-600: #174d94;
+    --cv-primary-700: #103f7c;
+    --cv-primary-900: #0a2854;
+
+    --cv-accent-500: #245ea9;
+    --cv-accent-600: #174d94;
+
+    --cv-font-title: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+    --cv-font-body: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
+
+    --cv-rule: #d7dee8;
+    --cv-ink: #1f2937;
+    --cv-ink-soft: #334155;
+}
+
+/* --------------------------------------------------------------------------
+   Feuille A4
+   -------------------------------------------------------------------------- */
+
+.cv-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    color: var(--cv-ink);
+    font-family: var(--cv-font-body);
+    /* Ecran uniquement : garde les angles de la feuille nets. Voir la regle
+       d'impression plus bas, ou cette declaration doit imperativement sauter. */
+    overflow: hidden;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
+.cv-page h1,
+.cv-page h2,
+.cv-page h3 {
+    font-family: var(--cv-font-title);
+}
+
+/* --------------------------------------------------------------------------
+   Titres de section
+   -------------------------------------------------------------------------- */
+
+.cv-section-title,
+.cv-sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--cv-primary-200);
+    padding-bottom: 0.375rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.055em;
+    color: var(--cv-primary-700);
+}
+
+.cv-section-title {
+    font-size: 10px;
+}
+
+.cv-sidebar-title {
+    font-size: 9.5px;
+}
+
+/* Un titre de section ne doit jamais rester seul en bas d'une page, et un
+   paragraphe ne doit pas laisser une ligne isolee de l'autre cote de la coupe. */
+.cv-section-title,
+.cv-sidebar-title {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.cv-page p,
+.cv-page li {
+    orphans: 2;
+    widows: 2;
+}
+
+.cv-icon-box {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.375rem;
+    background: var(--cv-primary-50);
+    color: var(--cv-primary-600);
+}
+
+/* --------------------------------------------------------------------------
+   Expériences (timeline)
+   -------------------------------------------------------------------------- */
+
+.cv-experience {
+    position: relative;
+    display: grid;
+    grid-template-columns: 84px 12px 1fr;
+    column-gap: 0.5rem;
+    padding-block: 0.5rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.cv-experience:not(:last-child) {
+    border-bottom: 1px dashed var(--cv-rule);
+}
+
+.cv-timeline-line {
+    position: absolute;
+    left: 5.5px;
+    top: 15px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--cv-primary-200);
+}
+
+.cv-experience:last-child .cv-timeline-line {
+    display: none;
+}
+
+.cv-timeline-dot {
+    z-index: 10;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    border: 2px solid white;
+    background: var(--cv-primary-600);
+    box-shadow: 0 0 0 1px var(--cv-primary-200);
+}
+
+/* --------------------------------------------------------------------------
+   Compétences et langues
+   -------------------------------------------------------------------------- */
+
+/* La couleur principale porte les titres et la structure ; la secondaire
+   marque tout ce qui exprime un niveau ou ponctue une liste. C'est ce partage
+   qui rend le second choix de couleur visible sur la feuille. */
+
+.cv-skill-track {
+    height: 3px;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: #e2e8f0;
+}
+
+.cv-skill-value {
+    height: 100%;
+    border-radius: 9999px;
+    background: var(--cv-accent-600);
+}
+
+.cv-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #cbd5e1;
+}
+
+.cv-dot--on {
+    background: var(--cv-accent-600);
+}
+
+/* Puces des listes « Outils » et « Centres d'intérêt ». */
+.cv-bullet {
+    color: var(--cv-accent-600);
+}
+
+/* --------------------------------------------------------------------------
+   Impression
+   -------------------------------------------------------------------------- */
+
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
+
+@media print {
+    html,
+    body {
+        width: 210mm;
+        margin: 0;
+        background: white !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    /*
+     * Rien de flottant ne doit atteindre le papier. Nuxt UI monte en permanence
+     * un conteneur de notifications en `position: fixed`, cale en bas a droite
+     * de la fenetre : meme vide, il se place hors de la feuille et suffit a
+     * produire une page supplementaire a l'impression.
+     */
+    .fixed,
+    [data-slot='viewport'] {
+        display: none !important;
+    }
+
+    .cv-page {
+        margin: 0;
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+
+        /*
+         * Indispensable. En media pagine, une boite dont l'`overflow` n'est pas
+         * `visible` devient monolithique : le navigateur refuse de la couper
+         * entre deux pages. Un CV plus long qu'une page verrait alors tout ce
+         * qui depasse 297 mm purement disparaitre a l'impression.
+         */
+        overflow: visible;
+    }
+
+    /* A4Frame reduit la feuille pour l'affichage : a l'impression elle doit
+       reprendre ses dimensions reelles. */
+    .cv-scale {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .cv-scale-outer {
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /*
+     * Ne doit sortir que la feuille. Le reste de l'interface porte `no-print`,
+     * mais les conteneurs qui l'habillent restent dans le flux : leurs marges,
+     * leur fond et leur hauteur minimale decaleraient la feuille et la
+     * pousseraient sur une seconde page.
+     *
+     * `print-canvas` marque tout conteneur enveloppant, `print-target` celui
+     * qui porte directement la feuille. Les deux pages qui affichent un CV
+     * (editeur et page publique) doivent les poser.
+     */
+    .print-canvas {
+        display: block !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: white !important;
+        min-height: 0 !important;
+    }
+
+    .print-target {
+        position: static !important;
+        width: 210mm !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "cv-studio",
+            "runtimeExecutable": "C:\\Users\\wendy\\.config\\herd\\bin\\php.bat",
+            "runtimeArgs": ["artisan", "dev"],
+            "port": 8000
+        }
+    ]
+}

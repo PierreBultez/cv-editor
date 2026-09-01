@@ -1,0 +1,6 @@
+Le suite « Unit » est declaree dans phpunit.xml mais ne contient encore aucun
+test : tout est couvert par des tests Feature, qui exercent la couche HTTP.
+
+Ce fichier existe parce que git ne suit pas les repertoires vides. Sans lui,
+`php artisan test` echoue sur un clone frais avec « Test directory not found »,
+alors qu il passe sur un poste ou le dossier a survecu a une suppression.

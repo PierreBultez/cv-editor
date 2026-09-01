@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "fullName": "Camille Moreau",
+    "jobTitle": "Chargée de communication digitale",
+    "techLine": "Réseaux sociaux • Rédaction • Événementiel",
+    "tagline": "Personnage fictif — ce CV sert d'exemple. Toute ressemblance avec une personne réelle serait fortuite."
+  },
+  "profile": "Après six ans passés entre agence et association, j'aime autant construire une ligne éditoriale que la défendre au quotidien. J'ai appris à écrire court, à mesurer ce qui fonctionne, et à travailler avec des équipes qui n'ont ni le temps ni le goût du jargon.",
+  "contact": [
+    { "type": "email",    "value": "camille.moreau@example.com" },
+    { "type": "phone",    "value": "06 12 34 56 78" },
+    { "type": "location", "value": "69003 Lyon, France" },
+    { "type": "website",  "value": "camille-moreau.example" },
+    { "type": "linkedin", "value": "linkedin.com/in/camille-moreau" },
+    { "type": "behance",  "value": "behance.net/camillemoreau" },
+    { "type": "linktree", "value": "linktr.ee/camillemoreau" }
+  ],
+  "sections": [
+    {
+      "id": "skills",
+      "type": "skills",
+      "title": "Compétences",
+      "column": "sidebar",
+      "enabled": true,
+      "items": [
+        { "label": "Rédaction et ligne éditoriale", "level": 90 },
+        { "label": "Réseaux sociaux : stratégie, calendrier, animation", "level": 85 },
+        { "label": "Organisation d'événements et relations partenaires", "level": 80 },
+        { "label": "Analyse d'audience et reporting", "level": 70 },
+        { "label": "Photographie et retouche", "level": 60 },
+        { "label": "Travail en équipe restreinte", "level": 90 }
+      ]
+    },
+    {
+      "id": "languages",
+      "type": "languages",
+      "title": "Langues",
+      "column": "sidebar",
+      "enabled": true,
+      "items": [
+        { "label": "Français", "mention": "Langue maternelle", "level": 5 },
+        { "label": "Anglais", "mention": "C1 — Autonome", "level": 5 },
+        { "label": "Espagnol", "mention": "B1 — Niveau seuil", "level": 3 }
+      ]
+    },
+    {
+      "id": "tools",
+      "type": "tools",
+      "title": "Logiciels / Outils",
+      "column": "sidebar",
+      "enabled": true,
+      "items": [
+        "Suite Adobe (Photoshop, InDesign)",
+        "Canva",
+        "Google Workspace",
+        "Notion | Trello",
+        "Meta Business Suite",
+        "Matomo",
+        "Brevo"
+      ]
+    },
+    {
+      "id": "interests",
+      "type": "interests",
+      "title": "Centres d'intérêt",
+      "column": "sidebar",
+      "enabled": true,
+      "items": [
+        "Randonnée",
+        "Photographie argentique",
+        "Bénévolat en médiathèque",
+        "Podcasts documentaires"
+      ]
+    },
+    {
+      "id": "experiences",
+      "type": "experiences",
+      "title": "Expériences professionnelles",
+      "column": "main",
+      "enabled": true,
+      "items": [
+        {
+          "period": "2023 — aujourd'hui",
+          "role": "Chargée de communication",
+          "company": "Association Le Fil Vert",
+          "location": "Lyon (69)",
+          "bullets": [
+            "Refonte de la ligne éditoriale et du calendrier de publication.",
+            "Animation de trois réseaux sociaux, audience doublée en dix-huit mois.",
+            "Organisation de deux événements annuels réunissant 400 participants."
+          ]
+        },
+        {
+          "period": "2021 — 2023",
+          "role": "Chargée de projet junior",
+          "company": "Agence Bonjour",
+          "location": "Villeurbanne (69)",
+          "bullets": [
+            "Suivi de six comptes clients, du brief à la livraison.",
+            "Rédaction de newsletters et de contenus de marque.",
+            "Coordination avec les graphistes et les prestataires vidéo."
+          ]
+        },
+        {
+          "period": "2020 — 2021",
+          "role": "Assistante communication — alternance",
+          "company": "Maison de quartier des Sources",
+          "location": "Lyon (69)",
+          "bullets": [
+            "Conception des supports imprimés pour la saison culturelle.",
+            "Mise à jour du site et de l'agenda en ligne."
+          ]
+        },
+        {
+          "period": "2018 — 2020",
+          "role": "Serveuse puis responsable de salle",
+          "company": "Café des Halles",
+          "location": "Lyon (69)",
+          "bullets": [
+            "Encadrement d'une équipe de quatre personnes le week-end.",
+            "Financement des études en parallèle de la licence."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "type": "education",
+      "title": "Formation",
+      "column": "main",
+      "enabled": true,
+      "items": [
+        {
+          "period": "2021",
+          "degree": "Master 1 Information et communication",
+          "school": "Université Lumière",
+          "location": "Lyon (69)",
+          "detail": "Parcours communication des organisations"
+        },
+        {
+          "period": "2019",
+          "degree": "Licence Lettres modernes",
+          "school": "Université Lumière",
+          "location": "Lyon (69)",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "id": "certifications",
+      "type": "certifications",
+      "title": "Certifications",
+      "column": "main",
+      "enabled": true,
+      "items": [
+        {
+          "period": "2024",
+          "degree": "Certification Voltaire — 850 points",
+          "school": "Projet Voltaire",
+          "location": "À distance",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}
