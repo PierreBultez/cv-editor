@@ -71,6 +71,27 @@ const toolbarHeight = ref(0);
 
 let toolbarObserver: ResizeObserver | null = null;
 
+/**
+ * Sous 640 px, les trois onglets ne tiennent avec leur icone qu'au prix d'un
+ * libelle coupe en « Apparen... ». Le libelle porte l'information, l'icone ne
+ * fait que l'illustrer : c'est donc elle qui saute.
+ *
+ * Une requete media plutot qu'une classe utilitaire, parce que le choix porte
+ * sur des *donnees* passees a `UTabs`, pas sur du style.
+ */
+const compact = ref(false);
+let compactQuery: MediaQueryList | null = null;
+
+function syncCompact(event: MediaQueryListEvent | MediaQueryList): void {
+    compact.value = event.matches;
+}
+
+const formTabs = computed(() => [
+    { label: 'Contenu', value: 'contenu', icon: compact.value ? undefined : 'i-lucide-list' },
+    { label: 'Apparence', value: 'apparence', icon: compact.value ? undefined : 'i-lucide-palette' },
+    { label: 'Réglages', value: 'reglages', icon: compact.value ? undefined : 'i-lucide-settings' },
+]);
+
 onMounted(() => {
     toolbarObserver = new ResizeObserver(() => {
         toolbarHeight.value = toolbar.value?.offsetHeight ?? 0;
@@ -80,11 +101,18 @@ onMounted(() => {
         toolbarObserver.observe(toolbar.value);
         toolbarHeight.value = toolbar.value.offsetHeight;
     }
+
+    compactQuery = window.matchMedia('(max-width: 639px)');
+    syncCompact(compactQuery);
+    compactQuery.addEventListener('change', syncCompact);
 });
 
 onBeforeUnmount(() => {
     toolbarObserver?.disconnect();
     toolbarObserver = null;
+
+    compactQuery?.removeEventListener('change', syncCompact);
+    compactQuery = null;
 });
 
 function printCv(): void {
@@ -155,90 +183,117 @@ function destroy(): void {
             ref="toolbar"
             class="no-print sticky top-0 z-20 border-b border-default bg-default/95 backdrop-blur"
         >
-            <div class="flex flex-wrap items-center gap-2 px-4 py-3">
-                <UButton to="/" variant="ghost" color="neutral" icon="i-lucide-arrow-left" size="sm">
-                    Accueil
+            <!--
+                Une seule rangee, y compris a 320 px : les libelles s'effacent
+                au profit des icones plutot que de faire passer la barre sur
+                deux lignes, dont la hauteur mangerait l'ecran d'un telephone.
+            -->
+            <div class="flex items-center gap-1 px-3 py-2 sm:gap-2 sm:px-4 sm:py-3">
+                <UButton
+                    to="/"
+                    variant="ghost"
+                    color="neutral"
+                    icon="i-lucide-arrow-left"
+                    size="sm"
+                    aria-label="Accueil"
+                >
+                    <span class="hidden sm:inline">Accueil</span>
                 </UButton>
 
                 <SaveIndicator :state="store.saveState" :error="store.lastError" />
 
-                <div class="ml-auto flex flex-wrap items-center gap-2">
+                <div class="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
                     <UButton
                         size="sm"
                         variant="subtle"
                         color="neutral"
                         :icon="copied ? 'i-lucide-check' : 'i-lucide-link'"
+                        :aria-label="copied ? 'Lien public copié' : 'Copier le lien public'"
                         @click="copyLink"
                     >
-                        {{ copied ? 'Copié' : 'Lien public' }}
+                        <span class="hidden sm:inline">{{ copied ? 'Copié' : 'Lien public' }}</span>
                     </UButton>
-                    <UButton size="sm" icon="i-lucide-printer" @click="printCv">Imprimer / PDF</UButton>
+                    <UButton size="sm" icon="i-lucide-printer" aria-label="Imprimer ou exporter en PDF" @click="printCv">
+                        <span class="hidden sm:inline">Imprimer / PDF</span>
+                        <span class="sm:hidden">PDF</span>
+                    </UButton>
                 </div>
             </div>
         </header>
 
-        <UAlert
-            v-if="readonly"
-            class="no-print m-4"
-            color="warning"
-            variant="subtle"
-            icon="i-lucide-lock"
-            title="Lecture seule"
-            description="Ce navigateur ne détient pas le lien de modification de ce CV. Vous pouvez le consulter, mais pas le modifier. Si vous aviez conservé votre lien de modification, ouvrez-le : il rétablit l'accès."
-        />
+        <!--
+            Les bandeaux vivent dans un conteneur a marge interne : en marge
+            *externe*, la largeur pleine de `UAlert` s'ajoutait aux 2 x 16 px et
+            debordait la fenetre, a toutes les tailles d'ecran.
+        -->
+        <div v-if="readonly || (showKeepLink && editUrl)" class="no-print space-y-4 px-4 pt-4">
+            <UAlert
+                v-if="readonly"
+                color="warning"
+                variant="subtle"
+                icon="i-lucide-lock"
+                title="Lecture seule"
+                description="Ce navigateur ne détient pas le lien de modification de ce CV. Vous pouvez le consulter, mais pas le modifier. Si vous aviez conservé votre lien de modification, ouvrez-le : il rétablit l'accès."
+            />
+
+            <!--
+                Sans comptes, ce lien est le seul chemin de retour vers ce CV. Le
+                dire au moment ou il est encore temps evite la seule perte
+                irreversible que le modele autorise.
+            -->
+            <UAlert
+                v-if="showKeepLink && editUrl"
+                color="primary"
+                variant="subtle"
+                icon="i-lucide-key-round"
+                title="Conservez votre lien de modification"
+                :close="true"
+                @update:open="showKeepLink = false"
+            >
+                <template #description>
+                    <p class="mb-3">
+                        Il n'y a ni compte ni mot de passe : ce lien secret est le seul moyen de revenir modifier ce
+                        CV. Il est enregistré dans ce navigateur, mais vider les données du site ou changer d'appareil
+                        vous en ferait perdre l'accès — définitivement.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <UButton
+                            size="sm"
+                            :icon="copiedEdit ? 'i-lucide-check' : 'i-lucide-copy'"
+                            @click="copyEditLink"
+                        >
+                            {{ copiedEdit ? 'Copié' : 'Copier le lien' }}
+                        </UButton>
+                        <UButton size="sm" variant="subtle" icon="i-lucide-download" @click="downloadEditLink">
+                            Enregistrer le raccourci
+                        </UButton>
+                    </div>
+                </template>
+            </UAlert>
+        </div>
 
         <!--
-            Sans comptes, ce lien est le seul chemin de retour vers ce CV. Le
-            dire au moment ou il est encore temps evite la seule perte
-            irreversible que le modele autorise.
-        -->
-        <UAlert
-            v-if="showKeepLink && editUrl"
-            class="no-print m-4"
-            color="primary"
-            variant="subtle"
-            icon="i-lucide-key-round"
-            title="Conservez votre lien de modification"
-            :close="true"
-            @update:open="showKeepLink = false"
-        >
-            <template #description>
-                <p class="mb-3">
-                    Il n'y a ni compte ni mot de passe : ce lien secret est le seul moyen de revenir modifier ce
-                    CV. Il est enregistré dans ce navigateur, mais vider les données du site ou changer d'appareil
-                    vous en ferait perdre l'accès — définitivement.
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <UButton
-                        size="sm"
-                        :icon="copiedEdit ? 'i-lucide-check' : 'i-lucide-copy'"
-                        @click="copyEditLink"
-                    >
-                        {{ copiedEdit ? 'Copié' : 'Copier le lien' }}
-                    </UButton>
-                    <UButton size="sm" variant="subtle" icon="i-lucide-download" @click="downloadEditLink">
-                        Enregistrer le raccourci
-                    </UButton>
-                </div>
-            </template>
-        </UAlert>
+            ================= Deux volets =================
 
-        <!-- ================= Deux volets ================= -->
-        <div class="print-canvas grid gap-6 p-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+            `minmax(0, ...)` sur la colonne unique du telephone n'est pas
+            cosmetique : un element de grille vaut `min-width: auto`, donc au
+            moins la largeur minimale de son contenu. La feuille A4 mesurant
+            210 mm — 794 px — la colonne se calait sur 794 px et *toute* la page
+            defilait horizontalement, formulaire compris.
+        -->
+        <div class="print-canvas grid grid-cols-[minmax(0,1fr)] gap-6 p-4 pb-28 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:pb-4">
             <!-- Formulaire -->
-            <div class="no-print" :class="{ 'hidden lg:block': mobileTab === 'apercu' }">
+            <div class="no-print min-w-0" :class="{ 'hidden lg:block': mobileTab === 'apercu' }">
                 <div
                     class="sticky z-10 -mx-1 bg-default/95 px-1 py-2 backdrop-blur"
                     :style="{ top: `${toolbarHeight}px` }"
                 >
-                    <UTabs
-                        v-model="tab"
-                        :items="[
-                            { label: 'Contenu', value: 'contenu', icon: 'i-lucide-list' },
-                            { label: 'Apparence', value: 'apparence', icon: 'i-lucide-palette' },
-                            { label: 'Réglages', value: 'reglages', icon: 'i-lucide-settings' },
-                        ]"
-                    />
+                    <!--
+                        `size="sm"` n'est pas cosmetique : a la taille par
+                        defaut, « Apparence » et « Reglages » se faisaient
+                        tronquer sur un ecran de 320 px, icone comprise.
+                    -->
+                    <UTabs v-model="tab" size="sm" :items="formTabs" />
                 </div>
 
                 <div class="mt-4">
@@ -371,24 +426,46 @@ function destroy(): void {
                 </div>
             </div>
 
-            <!-- Aperçu -->
-            <div class="print-target lg:sticky lg:top-20 lg:self-start">
-                <A4Frame show-guides>
+            <!--
+                Aperçu. Sur telephone les deux volets s'excluent : empiles, il
+                fallait derouler tout le formulaire pour apercevoir la feuille.
+                Le `hidden` est repris a l'impression par `.print-target`, sans
+                quoi imprimer depuis un mobile sortirait une page blanche.
+            -->
+            <div
+                class="print-target min-w-0 lg:sticky lg:top-20 lg:self-start"
+                :class="{ 'hidden lg:block': mobileTab === 'editer' }"
+            >
+                <A4Frame show-guides controls>
                     <CvPreview :cv="store.doc" />
                 </A4Frame>
             </div>
         </div>
 
-        <!-- Bascule mobile -->
-        <div class="no-print fixed bottom-4 left-1/2 z-30 -translate-x-1/2 lg:hidden">
+        <!--
+            Bascule mobile. `content: false` empeche `UTabs` de monter le
+            panneau vide qui accompagne d'ordinaire les onglets : ici les deux
+            volets sont ailleurs dans la page, l'onglet ne fait que les
+            designer. Le retrait bas suit l'encoche des telephones recents.
+
+            Pas de `z-index` : le voile des modales de Nuxt UI vaut `auto`, et
+            la moindre cote positive faisait flotter cette pastille en pleine
+            lumiere par-dessus le recadreur de photo. En `fixed` sans cote, elle
+            passe au-dessus du contenu et sous le voile.
+        -->
+        <div
+            class="no-print fixed left-1/2 -translate-x-1/2 lg:hidden"
+            :style="{ bottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }"
+        >
             <UTabs
                 v-model="mobileTab"
                 size="sm"
+                :content="false"
                 :items="[
                     { label: 'Éditer', value: 'editer', icon: 'i-lucide-pencil' },
                     { label: 'Aperçu', value: 'apercu', icon: 'i-lucide-eye' },
                 ]"
-                class="rounded-full bg-default shadow-lg"
+                class="rounded-full bg-default shadow-lg ring ring-default"
             />
         </div>
 

@@ -24,7 +24,7 @@ function print(): void {
         vertical et les 2 rem horizontaux decalent la feuille et la font
         deborder sur une seconde page.
     -->
-    <div class="print-canvas min-h-screen bg-[#e9edf3] py-[12mm]">
+    <div class="print-canvas min-h-screen bg-[#e9edf3] py-6 sm:py-[12mm]">
         <!--
             Une page publique se visite souvent depuis un lien direct : sans
             porte de sortie, il ne reste que le bouton « précédent » du
@@ -36,9 +36,19 @@ function print(): void {
                 <CiviLogo height="1.5rem" />
             </UButton>
 
-            <div class="ml-auto flex flex-wrap gap-2">
-                <UButton to="/" icon="i-lucide-plus" variant="subtle">Créer mon CV</UButton>
-                <UButton icon="i-lucide-printer" color="neutral" @click="print">Imprimer / PDF</UButton>
+            <div class="ml-auto flex shrink-0 gap-2">
+                <UButton to="/" icon="i-lucide-plus" variant="subtle" aria-label="Créer mon CV">
+                    <span class="hidden sm:inline">Créer mon CV</span>
+                </UButton>
+                <UButton
+                    icon="i-lucide-printer"
+                    color="neutral"
+                    aria-label="Imprimer ou exporter en PDF"
+                    @click="print"
+                >
+                    <span class="hidden sm:inline">Imprimer / PDF</span>
+                    <span class="sm:hidden">PDF</span>
+                </UButton>
             </div>
         </div>
 
@@ -48,7 +58,11 @@ function print(): void {
             feuille, qui serait donc affichee legerement reduite.
         -->
         <div class="print-target mx-auto max-w-[calc(210mm+2rem)] px-4">
-            <A4Frame>
+            <!--
+                La loupe n'a d'effet que si la feuille est deja reduite : sur un
+                telephone, elle est le seul moyen de lire un CV recu par lien.
+            -->
+            <A4Frame controls>
                 <CvPreview :cv="cv" />
             </A4Frame>
         </div>

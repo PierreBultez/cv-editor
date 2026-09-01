@@ -117,6 +117,34 @@ Il ne rogne pas, il change la nature de la boîte.
 - Sur un ancêtre, il devient le conteneur de défilement d'un `position: sticky`,
   qui cesse alors de coller. La landing utilise `overflow-x-clip`.
 
+### Mise en page mobile de l'éditeur
+
+Trois causes distinctes, toutes mesurées au `scrollWidth` plutôt que devinées.
+
+- **Un élément de grille vaut `min-width: auto`**, donc au moins la largeur
+  minimale de son contenu. Le volet d'aperçu porte une feuille A4 de 210 mm, soit
+  794 px : sur un téléphone, la colonne unique se calait sur 794 px et *toute* la
+  page défilait horizontalement, formulaire compris. `grid-cols-[minmax(0,1fr)]`
+  plus `min-w-0` sur les deux volets.
+- **`transform: scale()` ne change pas la boîte de mise en page.** `A4Frame`
+  réduisait la feuille visuellement, mais son cadre continuait de réserver les
+  794 px réels. La feuille est désormais sortie du flux (`absolute`) dans une
+  boîte dimensionnée à la taille *réduite* — d'où le rétablissement de
+  `position: static` dans `@media print`.
+- **`m-4` sur un `UAlert` déborde**, à toutes les largeurs : le composant est
+  déjà en `w-full`, la marge externe s'ajoute donc aux 2 × 16 px. Les bandeaux
+  vivent maintenant dans un conteneur à marge interne.
+
+Deux pièges de la bascule mobile entre les deux volets :
+
+- Le volet masqué porte `hidden`, soit `display: none`, que `no-print` ne défait
+  pas : **imprimer depuis un téléphone sortait une page blanche**. D'où le
+  `display: block !important` sur `.print-target` dans `@media print`.
+- La pastille flottante « Éditer / Aperçu » portait `z-30`. Le voile des modales
+  de Nuxt UI est en `z-index: auto` : la pastille flottait donc, en pleine
+  lumière, par-dessus le recadreur de photo. Retirer le `z-index` suffit — en
+  `fixed` sans cote, elle passe au-dessus du contenu et sous le voile.
+
 ### Environnement et déploiement
 
 - `artisan serve` ne transmet au processus `php -S` qu'une liste blanche de
@@ -183,5 +211,6 @@ CI et déploiement automatiques.
 | **Impression d'un CV de deux pages** | Jamais vérifiée par un œil humain. La géométrie est mesurée et juste, mais la fragmentation de la grille à deux colonnes par Chrome reste inconnue. Seul point touchant la promesse centrale. |
 | `APP_NAME` du serveur | Vaut peut-être encore « CV Studio » : le `<title>` en dépend. `sed` puis `php artisan optimize`. |
 | Open Analytics en production | Répond 403 depuis `localhost`, attendu. À confirmer sur le domaine réel. |
+| Icônes servies par un tiers | Nuxt UI en mode Vue standalone ne regroupe pas `@iconify-json/lucide` au build : `printer`, `link`, `palette` et une douzaine d'autres sont demandées à `api.iconify.design` **à l'exécution**. Contredit le principe posé pour les polices, et fait dépendre l'interface d'un tiers. |
 | Tests côté client | Délibérément différés : aucun lanceur JavaScript. Les deux bugs d'interface ont été trouvés à l'usage, pas par des tests. |
 | Portée du script d'analyse | Il s'exécute aussi sur les CV publics, qui affichent des données personnelles. Le restreindre aux pages de présentation est une condition d'une ligne. |
