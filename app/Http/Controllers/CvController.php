@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCvRequest;
 use App\Models\Cv;
 use App\Services\PhotoProcessor;
 use App\Support\CvDefaults;
+use App\Support\SocialCard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,7 @@ class CvController extends Controller
         return Inertia::render('Landing', [
             'fonts' => CvDefaults::FONTS,
             'templates' => CvDefaults::TEMPLATES,
-        ]);
+        ])->withViewData(SocialCard::landing());
     }
 
     /**
@@ -73,7 +74,10 @@ class CvController extends Controller
 
         return Inertia::render('PublicCv', [
             'cv' => $this->present($cv),
-        ])->withViewData(['allowIndexing' => $cv->allow_indexing]);
+        ])->withViewData([
+            'allowIndexing' => $cv->allow_indexing,
+            ...SocialCard::forCv($cv),
+        ]);
     }
 
     public function destroy(Cv $cv): RedirectResponse

@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Les pages publiques portent des données personnelles : pas d'indexation
-         par défaut, l'utilisateur doit l'activer explicitement. --}}
+    {{-- Refus d'indexation par défaut : la plupart des pages portent des données
+         personnelles — un CV, un éditeur, une liste de CV. Seules celles qui
+         l'annoncent explicitement sont référençables : la page d'accueil, et un
+         CV dont l'auteur a coché la case. --}}
     @if (! ($allowIndexing ?? false))
         <meta name="robots" content="noindex, nofollow">
     @endif
@@ -19,6 +21,34 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#6c3cff">
+
+    {{-- Aperçu de partage. Les valeurs viennent de App\Support\SocialCard ;
+         celles par défaut couvrent les pages qui n'en fournissent pas. --}}
+    @php
+        $ogTitle ??= config('app.name', 'Civi');
+        $ogDescription ??= 'Faites votre CV, pas votre mise en page. Gratuit, sans compte.';
+        $ogImage = url(\App\Support\SocialCard::IMAGE);
+    @endphp
+
+    <meta name="description" content="{{ $ogDescription }}">
+
+    <meta property="og:site_name" content="Civi">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:type" content="{{ $ogType ?? 'website' }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDescription }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Civi — le générateur de CV">
+
+    {{-- `summary_large_image` affiche la vignette en pleine largeur ;
+         `summary` la réduirait à une petite miniature carrée. --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $ogDescription }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
 
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
