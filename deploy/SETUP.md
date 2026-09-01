@@ -67,31 +67,40 @@ sudo find /var/www/cv/storage /var/www/cv/bootstrap/cache -type d -exec chmod g+
 Le workflow de déploiement rejoue ces commandes à chaque passage — sur les
 seuls fichiers qu'il a déposés, `chgrp` et `chmod` exigeant d'être propriétaire.
 
-### L'umask de PHP-FPM
+### Deux identités qui écrivent au même endroit
 
-Il reste un piège. PHP-FPM crée ses fichiers avec l'umask `022` par défaut :
-dossiers en `755`, fichiers en `644`. Le groupe peut lire, pas écrire. Le bit
-`setgid` donne le bon groupe, pas le droit d'écriture.
+Il reste un piège, et c'est le vrai. PHP-FPM crée ses fichiers avec l'umask
+`022` : dossiers en `755`, fichiers en `644`. Le groupe peut lire, pas écrire.
+Le bit `setgid` donne le bon groupe, mais **pas** le droit d'écriture.
 
 Conséquence : tout ce que l'application écrit — les photos, les caches —
 devient intouchable pour l'utilisateur de déploiement, et `db:seed` ou
-`artisan optimize` échouent sur un « Unable to create a directory ».
+`artisan optimize` échouent sur un « Unable to create a directory », alors même
+que le dossier parent porte le bon groupe.
 
-Dans `/etc/php/8.4/fpm/pool.d/www.conf` :
-
-```ini
-process.umask = 0002
-```
-
-```bash
-sudo systemctl restart php8.4-fpm
-```
-
-Puis, une fois, pour reprendre les fichiers déjà créés avec l'ancien umask :
+La réponse propre est une **ACL par défaut**, qui accorde les droits au groupe
+du serveur web sur tout ce qui sera créé, quel que soit l'umask du processus
+créateur :
 
 ```bash
-sudo chmod -R g+rwX /var/www/cv/storage /var/www/cv/bootstrap/cache
+sudo setfacl -R  -m g:www-data:rwx -m u:pierre:rwx /var/www/cv/storage /var/www/cv/bootstrap/cache
+sudo setfacl -R -d -m g:www-data:rwx -m u:pierre:rwx /var/www/cv/storage /var/www/cv/bootstrap/cache
 ```
+
+La première ligne traite l'existant, la seconde (`-d`, *default*) fait hériter
+les droits aux fichiers créés ensuite. C'est ce qui règle le problème
+durablement, sans toucher à la configuration de PHP.
+
+Vérification :
+
+```bash
+getfacl /var/www/cv/storage/app/public | head
+```
+
+Si `setfacl` est absent : `sudo apt install acl`. À défaut d'ACL, l'alternative
+est d'imposer l'umask au service — `sudo systemctl edit php8.4-fpm`, puis
+`[Service]` / `UMask=0002` — ce qui est plus large, car cela s'applique à tous
+les sites servis par ce pool.
 
 `storage/` est exclu du `rsync` — il porte les photos et les journaux, qui
 appartiennent au serveur, pas au dépôt. Son squelette est donc créé par le
