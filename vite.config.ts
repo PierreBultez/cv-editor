@@ -28,9 +28,23 @@ const cvFonts = [
      * public/build : ils sont donc servis depuis notre propre domaine, sans
      * aucune requête vers un tiers à l'exécution.
      */
-    bunny('Poppins', {
+    local('Poppins', {
         alias: 'poppins',
-        weights: [400, 500, 600, 700, 800],
+        variants: [
+            {
+                src: ['resources/fonts/Poppins-Variable.woff2', 'resources/fonts/Poppins-Variable.woff'],
+                weight: '100 900',
+                style: 'normal',
+            },
+            {
+                src: [
+                    'resources/fonts/Poppins-VariableItalic.woff2',
+                    'resources/fonts/Poppins-VariableItalic.woff',
+                ],
+                weight: '100 900',
+                style: 'italic',
+            },
+        ],
         fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
     }),
     local('Satoshi', {
