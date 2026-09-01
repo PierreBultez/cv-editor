@@ -121,12 +121,18 @@ jobs:
 
             # rsync depose les fichiers sous l'identite de l'utilisateur de
             # deploiement, dont le groupe primaire n'est pas celui du serveur
-            # web : PHP-FPM ne pouvait alors ecrire ni les journaux ni les
-            # photos. On donne donc explicitement le groupe du serveur web, avec
-            # le bit setgid pour que les fichiers crees ensuite en heritent.
-            chgrp -R "\$WEB_GROUP" storage bootstrap/cache
-            chmod -R g+rwX storage bootstrap/cache
-            find storage bootstrap/cache -type d -exec chmod g+s {} +
+            # web : PHP-FPM ne pourrait alors ecrire ni les journaux ni les
+            # photos. On leur donne donc le groupe du serveur web, avec le bit
+            # setgid pour que les fichiers crees ensuite en heritent.
+            #
+            # Uniquement sur ce que l'on possede : les photos et les caches ont
+            # ete ecrits par PHP-FPM, ils portent deja le bon groupe grace au
+            # setgid, et chgrp comme chmod echouent sur un fichier dont on n'est
+            # pas proprietaire.
+            MINE="\$(id -un)"
+            find storage bootstrap/cache -user "\$MINE" -exec chgrp "\$WEB_GROUP" {} +
+            find storage bootstrap/cache -user "\$MINE" -exec chmod g+rwX {} +
+            find storage bootstrap/cache -user "\$MINE" -type d -exec chmod g+s {} +
 
             php artisan storage:link --force
             php artisan migrate --force
