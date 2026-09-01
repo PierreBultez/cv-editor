@@ -1,47 +1,14 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# Civi — notes de reprise
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+Générateur de CV en ligne, sans comptes : Laravel 13 + Inertia 3 + Vue 3 +
+Tailwind v4 + Nuxt UI 4 en mode Vue standalone. MariaDB en production, SQLite en
+développement. Déployé sur `cv.pierrebultez.com`.
 
-## Prerequisites
+**Les notes complètes sont dans [`CLAUDE.md`](CLAUDE.md)** : comment lancer le
+projet sur ce poste, les décisions à ne pas rejouer, les invariants, la carte du
+code, les pièges rencontrés et les points ouverts.
 
-Verify that PHP and Composer are available:
+Un seul fichier fait foi, pour éviter que deux copies divergent.
 
-```sh
-php -v
-composer -V
-```
-
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
-
-macOS:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+Voir aussi [`README.md`](README.md) pour le produit et
+[`deploy/SETUP.md`](deploy/SETUP.md) pour la mise en production.
