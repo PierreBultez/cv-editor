@@ -115,7 +115,13 @@ const MARQUEE = ['SIMPLE', 'RAPIDE', 'GRATUIT', 'SANS COMPTE', 'SANS PUB', 'SANS
 <template>
     <Head title="Faites votre CV, pas votre mise en page" />
 
-    <div class="overflow-x-hidden bg-ecru text-anthracite">
+    <!--
+        `overflow-x-clip` et non `hidden` : `hidden` ferait de ce conteneur le
+        parent de défilement de l'en-tête, qui perdrait alors son `sticky`
+        faute de quoi s'accrocher. `clip` rogne le débordement des halos du
+        hero sans créer de conteneur de défilement.
+    -->
+    <div class="overflow-x-clip bg-ecru text-anthracite">
         <!-- ================= En-tête ================= -->
         <header
             class="sticky top-0 z-50 border-b border-anthracite/7 bg-ecru/85 backdrop-blur-[14px]"
